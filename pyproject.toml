@@ -1,0 +1,26 @@
+[tool.poetry]
+name = 'holistics_validation'
+version = '1.0.0'
+description = 'A tool for validating holistics code'
+readme = "README.md"
+authors = ["Spoiler Alert"]
+keywords = [
+    "Holistics",
+    "AML",
+    "CI",
+    "continuous integration",
+    "testing",
+    "validation",
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+google-cloud-bigquery = '^3.17'
+
+[tool.poetry.scripts]
+holistics_validation = 'holistics_validation.cli:main'
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
