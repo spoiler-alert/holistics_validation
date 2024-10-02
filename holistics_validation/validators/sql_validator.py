@@ -62,8 +62,8 @@ class SQLValidator():
             for override in overrides:
                 full_table_name = full_table_name.replace(override[0], override[1])
         else:
-            if "{%" in model['sql']:
-                print(f"We don't currently support validating parameterized queries, skipping validation for {model['name']}")
+            if "{%" in model['sql'] or '{{' in model['sql']:
+                print(f"We don't currently support validating parameterized queries or queries that reference other models, skipping validation for {model['name']}")
                 return
             short_table_name = 'temp_table'
             full_table_name = 'temp_table'
