@@ -1,6 +1,8 @@
 import argparse
+import traceback
 
 from holistics_validation.validators.sql_validator import run_sql_validation
+from holistics_validation.logger import logger
 
 def create_parser():
     parser = argparse.ArgumentParser(
@@ -17,24 +19,28 @@ def create_parser():
     parser_sql.add_argument('--branch_name', help='Used only if commit id is not specified. Leaving both unspecified means it will test against production.') 
     parser_sql.add_argument('--bq_project_name', required=True) ## assumes that you have a BQ config file set up, if this is ever generalized to other query enginers then engine should probably be a sub-command with different inputs
     parser_sql.add_argument('--overrides', 
-                        help='Overrides do a blanket replace from one value to another in all SQL, useful for things like testing against a different data source.  Format of "orig_value_1:new_name_1,orig_name_2:new_name_2,etc".  Currently does not support using "," or ":" in the actual override values.')
+                        help='Overrides do a blanket replace from one value to another in all SQL, useful for things like testing against a different data source.')
     return parser
 
 
 def main():
-    parser = create_parser()
-    args = parser.parse_args()
+    try: 
+        parser = create_parser()
+        args = parser.parse_args()
 
-    if args.command == 'sql':
-        run_sql_validation(
-            'bigquery', ## TODO: shouldn't be hardcoded if generalize to other engines
-            {'bq_project_name': args.bq_project_name}, ## TODO: shouldn't be hardcoded if generalize to other engines
-            holistics_api_key = args.holistics_api_key, 
-            holistics_project_id = args.holistics_project_id,
-            commit_oid = args.commit_oid, 
-            branch_name = args.branch_name,
-            override_string = args.overrides
-        )
+        if args.command == 'sql':
+            run_sql_validation(
+                'bigquery', ## TODO: shouldn't be hardcoded if generalize to other engines
+                {'bq_project_name': args.bq_project_name}, ## TODO: shouldn't be hardcoded if generalize to other engines
+                holistics_api_key = args.holistics_api_key, 
+                holistics_project_id = args.holistics_project_id,
+                commit_oid = args.commit_oid, 
+                branch_name = args.branch_name,
+                override_string = args.overrides
+            )
+    except Exception as e:
+        logger.error(traceback.format_exc()) #ensures the error is logged in the log file and not just the console 
+        raise e
 
 
 if __name__ == '__main__':

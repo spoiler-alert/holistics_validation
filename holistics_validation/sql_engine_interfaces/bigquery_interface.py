@@ -1,7 +1,6 @@
 from google.cloud import bigquery
 
 ## Notes: BQ allows you to start a job and check on it later so we can easily do it asynchronously, other sql engines might not work exactly the same 
-## Assumes that there's a credentials file in the expected place, so only need to pass in project name - there are other ways to do BQ credentials
 
 class BigQueryInterface():
     def __init__(self, credential_dict):
