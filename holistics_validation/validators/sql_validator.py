@@ -45,8 +45,8 @@ def run_sql_validation(sql_engine, credential_dict, holistics_api_key, holistics
     for model in data['data_models']:
         try:
             sql_validator = SQLValidator(sql_interface_object)
-            model_validations.append(sql_validator)
             sql_validator.start_validation(model, overrides)
+            model_validations.append(sql_validator)
         except Exception as e:
             logger.error(traceback.format_exc())
             failure_creating_query.append(model['name'])
