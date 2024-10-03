@@ -22,10 +22,10 @@ NOTE: if NEITHER commit_oid or branch_name are specified, then it runs against p
 
 ### SQL Validation 
 
-Validates all SQL fields using the specified SQL engine.  Run `holistics_validation sql`.  
+Validates all SQL fields using the specified SQL engine.  To use, run `holistics_validation sql`.  Relies on the endpoint [here](https://docs.holistics.io/api#tag/Data-Models/operation/DataModels_List).  
 
 Arguments for SQL validation, regardless of SQL engine: 
-- `overrides` (optional): Overrides do a blanket replace from one value to another in all SQL, useful for things like testing against a different data source.  Format of "orig_value_1:new_name_1,orig_name_2:new_name_2,etc".  Currently does not support using "," or ":" in the actual override values.  Certain characters will need to be escaped (ex. if you're using \` then you will need to escape it with a \\).  
+- `overrides` (optional): Overrides do a blanket replace from one value to another in all SQL, useful for things like testing against a different data source.  Format of "orig_value_1:new_value_1,orig_value_2:new_value_2,etc".  Currently does not support using "," or ":" in the actual override values.  Certain characters will need to be escaped (ex. if you're using \` then you will need to escape it with a \\).  
 
 Currently supports the following SQL engines:
 
