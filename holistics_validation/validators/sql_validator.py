@@ -187,19 +187,20 @@ class SQLValidator():
         return self.field_dicts['dimensions'].values(), self.field_dicts['measures'].values()
 
     def check_validation(self):
-        failures = {}
+        failures = []
         for key, val in self.validation_jobs.items():
 
+            validation_name = f'{val['name']} {key}'
             try:
-                logger.debug(f"Checking validation for {val['name']} {key}")
+                logger.debug(f"Checking validation for {validation_name}")
                 self.sql_interface_object.check_job_results(val['job'])
             except Exception as e:
                 logger.error("Validation query failed, query that was run is below:")
                 logger.error(val['query'])
                 logger.error(traceback.format_exc())
-                failures[key] = val
+                failures.append(validation_name)
             else:
-                logger.info(f"Successfully validated {val['name']} {key}")
+                logger.info(f"Successfully validated {validation_name}")
             
         logger.info("Finished checking all validation queries")
         return failures
