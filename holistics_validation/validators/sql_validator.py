@@ -190,7 +190,7 @@ class SQLValidator():
         failures = []
         for key, val in self.validation_jobs.items():
 
-            validation_name = f'{val['name']} {key}'
+            validation_name = f"{val['name']} {key}"
             try:
                 logger.debug(f"Checking validation for {validation_name}")
                 self.sql_interface_object.check_job_results(val['job'])
