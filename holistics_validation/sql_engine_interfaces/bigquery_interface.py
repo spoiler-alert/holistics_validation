@@ -24,18 +24,19 @@ class BigQueryInterface():
             """
         
         # Note: 'median' uses a window function ex. `PERCENTILE_CONT ( field, 0.5 ) OVER (  )` - this breaks as a measure when combined with other measures
-        # Note: it says count distinct is supported, but I can't figure out how to call it as an aggregation type
         self.aggregation_dict = {
-            'min': 'MIN',
-            'max': 'MAX',
-            'sum': 'SUM',
-            'count': 'COUNT',
-            'avg': 'AVG',
-            'stdev': 'STDDEV_SAMP',
-            'stdevp': 'STDDEV_POP',
-            'var': 'VAR_SAMP',
-            'varp': 'VAR_POP',
+            'min': 'MIN( {field} )',
+            'max': 'MAX( {field} )',
+            'sum': 'SUM( {field} )',
+            'count': 'COUNT( {field} )',
+            'avg': 'AVG( {field} )',
+            'stdev': 'STDDEV_SAMP( {field} )',
+            'stdevp': 'STDDEV_POP( {field} )',
+            'var': 'VAR_SAMP( {field} )',
+            'varp': 'VAR_POP( {field} )',
+            'count distinct': 'COUNT( DISTINCT {field} )'
         }
+
 
 
     def start_job(self, query_string):
