@@ -151,7 +151,7 @@ class SQLValidator():
                         raise RuntimeError("Aggregation type is not supported for dimensions") 
                     if j == 'measures' and field_aggregation_type != 'custom' :
                         if field_aggregation_type in aggregation_dict:
-                            field_sql = f'{aggregation_dict[field_aggregation_type]}( {field_sql} )'
+                            field_sql = aggregation_dict[field_aggregation_type].format(field = field_sql)
                         else:
                             raise NotImplementedError(f"We don't yet have logic for aggregation_type of '{field_aggregation_type}' in the validation script, please add it to this script or modify the field to use custom logic") ## TODO: explain why each type is not implemented, would depend on the sql engine
 
