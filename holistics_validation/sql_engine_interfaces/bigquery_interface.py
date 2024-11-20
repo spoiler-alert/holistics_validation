@@ -7,23 +7,44 @@ class BigQueryInterface():
 
         self.client = bigquery.Client(project=credential_dict['bq_project_name'])
         
-        self.base_query = """
-            {cte}
-
-            SELECT 
-            {fields}
-
-            FROM {table}
-            LIMIT 1;
+        ## TODO: edge case where dimensions are all aggregated - this would be a pretty extreme edge case, harder to handle than the reverse
+        self.base_queries = {
+        'dimensions':
             """
-        
+                {cte}
+
+                SELECT 
+                {fields}
+
+                FROM {table}
+
+                LIMIT 1;
+                """,
+
+        ## For measures, we want to add in a constant as the first field and group by it to account for the edge case of only measures that haven't been aggregated correctly
+        'measures':
+            """
+                {cte}
+
+                SELECT 
+                1, 
+                {fields}
+
+                FROM {table}
+
+                GROUP BY 1
+
+                LIMIT 1;
+                """
+        }
+
         self.cte = """
             WITH temp_table AS (
                 {table_sql}
             )
             """
         
-        # Note: 'median' uses a window function ex. `PERCENTILE_CONT ( field, 0.5 ) OVER (  )` - this breaks as a measure when combined with other measures
+        # Note: 'median' uses a window function ex. `PERCENTILE_CONT ( field, 0.5 ) OVER (  )` - this is not easy to combine with other measures for this logic
         self.aggregation_dict = {
             'min': 'MIN( {field} )',
             'max': 'MAX( {field} )',

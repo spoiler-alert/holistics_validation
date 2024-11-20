@@ -1,19 +1,17 @@
-from holistics_validation.holistics_api_client import validate_aml
+from holistics_validation.holistics_api_client import publish_aml
 from holistics_validation.logger import logger
 from holistics_validation.exceptions import FailedValidation, UnexpectedJobStatus
 
-def run_aml_validation(holistics_base_url, holistics_api_key, commit_oid, branch_name):
-    status = validate_aml(
+def run_publish_aml(holistics_base_url, holistics_api_key):
+    status = publish_aml(
         holistics_base_url = holistics_base_url,
-        holistics_api_key = holistics_api_key, 
-        commit_oid=commit_oid,
-        branch_name=branch_name
+        holistics_api_key = holistics_api_key
     )
 
     if status == 'success':
-        logger.info(f'AML Validation completed successfully')
+        logger.info(f'Publish AML completed successfully')
     elif status == 'failure':
-        logger.error(f"AML Validation failed")
+        logger.error(f"Publish AML failed")
         raise FailedValidation()
     else: 
         logger.error(f"Found an unexpected job status: '{status}'")
