@@ -7,5 +7,8 @@ class ReferencesUndefinedSQL(RuntimeError):
 class FailedValidation(RuntimeError):
     pass
 
+class FailedPublish(RuntimeError):
+    pass
+
 class UnexpectedJobStatus(RuntimeError):
     pass

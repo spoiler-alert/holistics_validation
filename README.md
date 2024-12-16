@@ -76,3 +76,4 @@ Publishes any code that is merged into the master branch.  To use, run `holistic
 - Versions
 - Add automated testing
 - Do we want to open-source this?  If so, it needs some more generalization and improvements, plus adding to pypi
+- Consider automatic retries

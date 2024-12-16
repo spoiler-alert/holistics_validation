@@ -17,17 +17,17 @@ def retrieve_model_fields(holistics_base_url, holistics_api_key, holistics_proje
 
     endpoint = 'data_models'
     request_url = holistics_base_url + endpoint
+    headers = {'X-Holistics-Key': holistics_api_key, "Content-Type": "application/json"} 
 
     if commit_oid:
-        payload = {'project_id': holistics_project_id, 'commit_oid': commit_oid}
+        query_params = {'project_id': holistics_project_id, 'commit_oid': commit_oid}
     elif branch_name:
-        payload = {'project_id': holistics_project_id, 'branch_name': branch_name}
+        query_params = {'project_id': holistics_project_id, 'branch_name': branch_name}
     else:
-        payload = {'project_id': holistics_project_id}
+        query_params = {'project_id': holistics_project_id}
     
-    headers = {'X-Holistics-Key': holistics_api_key} 
-    logger.debug(f'Attempting request against "{request_url}" using the following payload: {payload}')
-    request_job = requests.get(request_url, headers = headers, data = payload)
+    logger.debug(f'Attempting request against "{request_url}" using the following query params: {query_params}')
+    request_job = requests.get(request_url, headers = headers, params = query_params)
     data = parse_response(request_job)
 
     return data
@@ -37,13 +37,13 @@ def check_job_completion(holistics_base_url, holistics_api_key, job_id):
 
     endpoint = f'jobs/{job_id}/result'
     request_url = holistics_base_url + endpoint
+    headers = {'X-Holistics-Key': holistics_api_key, "Content-Type": "application/json"} 
 
     logger.debug(f'Checking status of job: {job_id}')
 
     tries = 1
     while True:
-        headers = {'X-Holistics-Key': holistics_api_key} 
-        logger.debug(f'Attempting request against "{request_url}" with no payload')
+        logger.debug(f'Attempting request against "{request_url}"')
         request_job = requests.get(request_url, headers = headers)
         data = parse_response(request_job)
         status = data['status']
@@ -64,11 +64,11 @@ def validate_aml(holistics_base_url, holistics_api_key, commit_oid, branch_name)
 
     endpoint = 'aml_studio/projects/submit_validate'
     request_url = holistics_base_url + endpoint
+    headers = {'X-Holistics-Key': holistics_api_key, "Content-Type": "application/json"} 
 
     payload = {'commit_oid': commit_oid, 'branch_name': branch_name}
-    headers = {'X-Holistics-Key': holistics_api_key} 
     logger.debug(f'Attempting request against "{request_url}" using the following payload: {payload}')
-    request_job = requests.post(request_url, headers = headers, data = payload)
+    request_job = requests.post(request_url, headers = headers, json = payload)
     data = parse_response(request_job)
 
     status = check_job_completion(holistics_base_url, holistics_api_key, data['job']['id'])
@@ -80,9 +80,9 @@ def publish_aml(holistics_base_url, holistics_api_key):
 
     endpoint = 'aml_studio/projects/submit_publish'
     request_url = holistics_base_url + endpoint
-
     headers = {'X-Holistics-Key': holistics_api_key, "Content-Type": "application/json"} 
-    logger.debug(f'Attempting request against "{request_url}" with no payload')
+
+    logger.debug(f'Attempting request against "{request_url}"')
     request_job = requests.post(request_url, headers = headers)
     data = parse_response(request_job)
 
