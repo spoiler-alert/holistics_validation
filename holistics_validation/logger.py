@@ -17,7 +17,7 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
 stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.WARN) #only warnings and above go to the console to let the user know something weird is happening
+stream_handler.setLevel(logging.INFO) #only info and above go to the console
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 

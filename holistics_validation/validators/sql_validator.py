@@ -27,12 +27,13 @@ def parse_overrides(override_string):
     return override_list
 
 
-def run_sql_validation(sql_engine, credential_dict, holistics_api_key, holistics_project_id, commit_oid = None, branch_name = None, override_string = None):
+def run_sql_validation(sql_engine, credential_dict, holistics_base_url, holistics_api_key, holistics_project_id, commit_oid = None, branch_name = None, override_string = None):
 
     sql_interface_object = sql_engine_interfaces[sql_engine](credential_dict)
     overrides = parse_overrides(override_string)
 
     data = retrieve_model_fields(
+        holistics_base_url = holistics_base_url,
         holistics_api_key = holistics_api_key, 
         holistics_project_id = holistics_project_id, 
         commit_oid=commit_oid,
@@ -64,6 +65,8 @@ def run_sql_validation(sql_engine, credential_dict, holistics_api_key, holistics
     
     if failure_creating_query or failure_validating_query: 
         raise FailedValidation()
+    
+    return True
 
 class SQLValidator():
     def __init__(self, sql_interface_object):
@@ -71,7 +74,7 @@ class SQLValidator():
 
     def start_validation(self, model, overrides = []):
 
-        logger.info(f"Starting validation of fields in model: {model['name']}")
+        logger.debug(f"Starting validation of fields in model: {model['name']}")
         self.validation_jobs = {}
 
         if model['sql'] is None:
@@ -91,9 +94,9 @@ class SQLValidator():
                 cte = cte.replace(override[0], override[1])
 
         dimensions, measures = self.create_field_dicts(model['name'], model['dimensions'], model['measures'], short_table_name)
-        for key, val in {'dimension': dimensions, 'measures': measures}.items():
+        for key, val in {'dimensions': dimensions, 'measures': measures}.items():
             if len(val) > 0:
-                query = self.sql_interface_object.base_query.format(cte = cte, fields = ',\n'.join(val), table = full_table_name) 
+                query = self.sql_interface_object.base_queries[key].format(cte = cte, fields = ',\n'.join(val), table = full_table_name) 
 
                 self.validation_jobs[key] = {
                     'name': model['name'],
@@ -101,7 +104,7 @@ class SQLValidator():
                     'query': query, 
                     }
             else:
-                logger.info(f"No {key} found for {model['name']}, skipping validation for dimensions")
+                logger.warning(f"No {key} found for {model['name']}, skipping validation for dimensions")
 
         return self.validation_jobs
 
@@ -163,7 +166,7 @@ class SQLValidator():
                     else:
                         self.field_dicts[j][field_name] = field_sql
 
-            ## handling the depending fields
+            ## handling the dependent fields
             dependent_field_len = len(dependent_fields)
             while True:
                 if len(dependent_fields) > 0:
@@ -181,8 +184,8 @@ class SQLValidator():
                 if len(dependent_fields) < dependent_field_len:
                     dependent_field_len = len(dependent_fields)
                 else:
-                    logger.error(f"For {model_name} {j}: The SQL fields remaining are dependent on either other fields that aren't defined in SQL (they could be defined as AQL, which would break): {dependent_fields}")
-                    raise ReferencesUndefinedSQL("SQL fields remaining are dependent on either other fields that aren't defined in SQL (they could be defined as AQL, which would break)")
+                    logger.error(f"For {model_name} {j}: The SQL fields remaining are dependent on either other fields that aren't defined in SQL (they could be defined as AQL, which would break) OR are dimensions dependent on measures: {dependent_fields}")
+                    raise ReferencesUndefinedSQL("SQL fields remaining are dependent on either other fields that aren't defined in SQL (they could be defined as AQL, which would break) OR are dimensions dependent on measures")
 
         return self.field_dicts['dimensions'].values(), self.field_dicts['measures'].values()
 
