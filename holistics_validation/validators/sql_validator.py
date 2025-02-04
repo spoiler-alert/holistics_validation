@@ -97,7 +97,7 @@ class SQLValidator():
         for key, val in {'dimensions': dimensions, 'measures': measures}.items():
             if len(val) > 0:
                 query = self.sql_interface_object.base_queries[key].format(cte = cte, fields = ',\n'.join(val), table = full_table_name) 
-
+                logger.error(query)
                 self.validation_jobs[key] = {
                     'name': model['name'],
                     'job': self.sql_interface_object.start_job(query), 
