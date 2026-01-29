@@ -8,6 +8,7 @@ class BigQueryInterface():
         self.client = bigquery.Client(project=credential_dict['bq_project_name'])
         
         ## TODO: edge case where dimensions are all aggregated - this would be a pretty extreme edge case, harder to handle than the reverse
+        ## TODO: edge case where dimension is a JSON - it passes with with logic, but Holistics/BQ struggle to GROUP BY the field
         self.base_queries = {
         'dimensions':
             """
