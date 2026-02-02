@@ -69,7 +69,7 @@ class SQLValidator():
     def __init__(self, sql_interface_object):
         self.sql_interface_object = sql_interface_object
 
-    def start_validation(self, model, overrides = []):
+    def start_validation(self, model, overrides):
 
         logger.debug("Starting validation of fields in model: %s", model['name'])
         self.validation_jobs = {}

@@ -15,7 +15,9 @@ def run_dashboard_validation(
     the widgets
     """
 
-    dashboard_list = dashboard_ids.split(',')
+    dashboard_list = [d.strip() for d in dashboard_ids.split(',') if d.strip()]
+    if not dashboard_list:
+        raise ValueError("dashboard_ids must contain at least one non-empty dashboard id")    
 
     # starts all the jobs since waiting for the queries might take quite a while 
     dashboard_job_dict = {}

@@ -2,7 +2,7 @@
 
 ## Installation: 
 
-You can install from github by doing either of the following:
+You can install from GitHub by doing either of the following:
 - Run `pip install git+ssh://git@github.com/spoiler-alert/holistics_validation.git`
 - Add `git+ssh://git@github.com/spoiler-alert/holistics_validation.git` to your requirements.txt
 

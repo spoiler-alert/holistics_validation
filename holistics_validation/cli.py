@@ -27,7 +27,7 @@ def aml_parser_add_args(parser):
     parser.add_argument('--branch_name', required=True) 
 
 def reporting_parser_add_args(parser):
-    pass 
+    generic_parser_add_args(parser)
 
 def dashboard_parser_add_args(parser):
     generic_parser_add_args(parser)
@@ -66,6 +66,10 @@ def main():
         parser = create_parser()
         args = parser.parse_args()
 
+        if args.command == 'reporting':
+            raise NotImplementedError('Waiting for for holistics to add an API endpoint for reporting validation')
+
+
         api_client = HolisticsAPIClient(                
             holistics_base_url = args.holistics_base_url,
             holistics_api_key = args.holistics_api_key, 
@@ -89,8 +93,6 @@ def main():
                 branch_name = args.branch_name,
             )
 
-        if args.command == 'reporting':
-            raise NotImplementedError('Waiting for for holistics to add an API endpoint for reporting validation')
 
         if args.command == 'dashboard':
             run_dashboard_validation(
