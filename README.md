@@ -98,3 +98,5 @@ Publishes any code that is merged into the master branch.  To use, run `holistic
 - Do we want to open-source this?  If so, it needs some more generalization and improvements, plus adding to pypi
 - Consider automatic retries
 - API version probably shouldn't be in the base URL, but this is a breaking change and should have versions implemented first 
+- Verbosity option added to cli instead of default debugging to file 
+- Add linting

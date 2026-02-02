@@ -9,6 +9,7 @@ class HolisticsAPIClient:
     def __init__(self, holistics_base_url, holistics_api_key):
         self.holistics_base_url = holistics_base_url
         self.headers = {'X-Holistics-Key': holistics_api_key, "Content-Type": "application/json"} 
+        self.session = requests.Session()
 
     def parse_response(self, request_job):
         logger.debug("Status code: %s", request_job.status_code)
@@ -30,7 +31,7 @@ class HolisticsAPIClient:
             query_params = {'project_id': holistics_project_id}
         
         logger.debug('Attempting request against "%s" using the following query params: %s', request_url, query_params)
-        request_job = requests.get(request_url, headers = self.headers, params = query_params)
+        request_job = self.session.get(request_url, headers = self.headers, params = query_params)
         data = self.parse_response(request_job)
 
         return data
@@ -46,7 +47,7 @@ class HolisticsAPIClient:
         tries = 1
         while True:
             logger.debug('Attempting request against "%s"', request_url)
-            request_job = requests.get(request_url, headers = self.headers)
+            request_job = self.session.get(request_url, headers = self.headers)
             data = self.parse_response(request_job)
             status = data['job']['status']
             logger.debug("Status: %s", status)
@@ -69,7 +70,7 @@ class HolisticsAPIClient:
 
         payload = {'commit_oid': commit_oid, 'branch_name': branch_name}
         logger.debug('Attempting request against "%s" using the following payload: %s', request_url, payload)
-        request_job = requests.post(request_url, headers = self.headers, json = payload)
+        request_job = self.session.post(request_url, headers = self.headers, json = payload)
         data = self.parse_response(request_job)
 
         return data['job']['id']
@@ -81,7 +82,7 @@ class HolisticsAPIClient:
         request_url = self.holistics_base_url + endpoint
 
         logger.debug('Attempting request against "%s"', request_url)
-        request_job = requests.post(request_url, headers = self.headers)
+        request_job = self.session.post(request_url, headers = self.headers)
         data = self.parse_response(request_job)
 
         return data['job']['id']
@@ -93,7 +94,7 @@ class HolisticsAPIClient:
         request_url = self.holistics_base_url + endpoint
 
         logger.debug('Attempting request against "%s"', request_url)
-        request_job = requests.post(request_url, headers = self.headers)
+        request_job = self.session.post(request_url, headers = self.headers)
         data = self.parse_response(request_job)
 
         return data['job']['id']
