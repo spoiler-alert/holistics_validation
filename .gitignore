@@ -2,3 +2,7 @@ __pycache__
 logs
 *.log
 .DS_Store
+.ruff_cache
+.pytest_cache
+.mypy_cache
+.venv

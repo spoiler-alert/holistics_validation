@@ -91,12 +91,28 @@ In order to enable a full holistics CI/CD pipeline, this project is going to als
 
 Publishes any code that is merged into the master branch.  To use, run `holistics_validation publish`.  There are no additional arguments specific to only the publish command.  
 
+## Local Development
+
+### Set-up
+Follow the instructions [here](https://docs.astral.sh/uv/getting-started/installation/) to get uv.  Then you can run `uv sync` to install the packages needed for development.  
+
+### Linting, Formatting, and Type Checks
+
+- Run `uv run ruff format` 
+- Run `uv run ruff check` 
+- Run `uv run mypy .`
+
+### Testing 
+
+- Run `uv run pytest`
+
+### WIP Installation
+
+- Run `pip install .` to install your work in progress so you can attempt using the cli functionality.  
 
 ## TODO: 
+- Write more tests
+- Optional dependencies for SQL queries
 - Versions
-- Add automated testing
-- Do we want to open-source this?  If so, it needs some more generalization and improvements, plus adding to pypi
-- Consider automatic retries
 - API version probably shouldn't be in the base URL, but this is a breaking change and should have versions implemented first 
-- Verbosity option added to cli instead of default debugging to file 
-- Add linting
+- Do we want to open-source this?  If so, it needs some more generalization and improvements, plus adding to pypi

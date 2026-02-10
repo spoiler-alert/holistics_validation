@@ -1,0 +1,7 @@
+exclude = [
+  ".cache",
+  "venv",
+  "__pycache__",
+]
+
+line-length = 120
