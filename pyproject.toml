@@ -1,6 +1,6 @@
 [tool.poetry]
 name = 'holistics_validation'
-version = '1.0.0'
+version = '1.1.0'
 description = 'A tool for validating holistics code'
 readme = "README.md"
 authors = ["Spoiler Alert"]
@@ -14,7 +14,7 @@ keywords = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 google-cloud-bigquery = '^3.17'
 
 [tool.poetry.scripts]

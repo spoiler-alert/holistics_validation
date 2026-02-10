@@ -1,8 +1,10 @@
 import argparse
 import traceback
 
+from holistics_validation.holistics_api_client import HolisticsAPIClient
 from holistics_validation.validators.sql_validator import run_sql_validation
 from holistics_validation.validators.aml_validator import run_aml_validation
+from holistics_validation.validators.dashboard_validator import run_dashboard_validation
 from holistics_validation.tooling.publish_aml import run_publish_aml
 from holistics_validation.logger import logger
 
@@ -24,8 +26,12 @@ def aml_parser_add_args(parser):
     parser.add_argument('--commit_oid', required=True) 
     parser.add_argument('--branch_name', required=True) 
 
-def content_parser_add_args(parser):
-    pass 
+def reporting_parser_add_args(parser):
+    generic_parser_add_args(parser)
+
+def dashboard_parser_add_args(parser):
+    generic_parser_add_args(parser)
+    parser.add_argument('--dashboard_ids', help='A single dashboard ID or comma separated list of dashboard IDs to validate', required=True) 
 
 def publish_parser_add_args(parser):
     generic_parser_add_args(parser)
@@ -43,8 +49,11 @@ def create_parser():
     aml_parser = subparsers.add_parser('aml', help = 'Validates AML for the given commit oid and branch')
     aml_parser_add_args(aml_parser)
 
-    content_parser = subparsers.add_parser('content', help = 'Validates if the code change will break any pre-existing content')
-    content_parser_add_args(content_parser)
+    reporting_parser = subparsers.add_parser('reporting', help = 'Validates if a given commit oid or branch will break any pre-existing quick / legacy dashboards')
+    reporting_parser_add_args(reporting_parser)
+
+    dashboard_parser = subparsers.add_parser('dashboard', help = 'Validates if the given dashboard(s) are broken')
+    dashboard_parser_add_args(dashboard_parser)
 
     publish_parser = subparsers.add_parser('publish', help = 'Publishes master branch')
     publish_parser_add_args(publish_parser)
@@ -57,12 +66,20 @@ def main():
         parser = create_parser()
         args = parser.parse_args()
 
+        if args.command == 'reporting':
+            raise NotImplementedError('Waiting for for holistics to add an API endpoint for reporting validation')
+
+
+        api_client = HolisticsAPIClient(                
+            holistics_base_url = args.holistics_base_url,
+            holistics_api_key = args.holistics_api_key, 
+        )
+
         if args.command == 'sql':
             run_sql_validation(
                 'bigquery', ## TODO: shouldn't be hardcoded if generalize to other engines
                 {'bq_project_name': args.bq_project_name}, ## TODO: shouldn't be hardcoded if generalize to other engines
-                holistics_base_url = args.holistics_base_url,
-                holistics_api_key = args.holistics_api_key, 
+                holistics_api_client = api_client, 
                 holistics_project_id = args.holistics_project_id,
                 commit_oid = args.commit_oid, 
                 branch_name = args.branch_name,
@@ -71,19 +88,21 @@ def main():
 
         if args.command == 'aml':
             run_aml_validation(
-                holistics_base_url = args.holistics_base_url,
-                holistics_api_key = args.holistics_api_key, 
+                holistics_api_client = api_client, 
                 commit_oid = args.commit_oid, 
                 branch_name = args.branch_name,
             )
 
-        if args.command == 'content':
-            raise NotImplementedError('Waiting for holistics to add an API command for content validation')
+
+        if args.command == 'dashboard':
+            run_dashboard_validation(
+                holistics_api_client = api_client, 
+                dashboard_ids = args.dashboard_ids
+            )
 
         if args.command == 'publish':
             run_publish_aml(
-                holistics_base_url = args.holistics_base_url,
-                holistics_api_key = args.holistics_api_key,
+                holistics_api_client = api_client, 
             )
 
 

@@ -2,11 +2,11 @@
 
 ## Installation: 
 
-You can install it by doing either of the following:
+You can install from GitHub by doing either of the following:
 - Run `pip install git+ssh://git@github.com/spoiler-alert/holistics_validation.git`
 - Add `git+ssh://git@github.com/spoiler-alert/holistics_validation.git` to your requirements.txt
 
-For now, we don't support versions so doing the above will pull the most up-to-date version from the main branch.  
+For now, we don't support multiple versions so doing the above will pull the most up-to-date version from the main branch.  
 
 ## General Usage: 
 
@@ -40,28 +40,48 @@ Currently supports the following SQL engines:
 
 ### AML Validation
 
-Validates all SQL fields using the specified SQL engine.  To use, run `holistics_validation aml`.  Arguments for AML validation: 
+Validates all SQL fields using the specified SQL engine.  To use, run `holistics_validation aml`.  
+
+Arguments for AML validation: 
 - `commit_oid` (required)
-- `branch_name` (optional): should be in the form of `origin/{branch_name}`
+- `branch_name` (required): should be in the form of `origin/{branch_name}`
 
 Intended to cover:
 - Models
 - Datasets
-- Canvas Dashboards
+- Canvas Dashboards (v4)
 
 Known limitations:
-- Compilation errors on widgets due to a modeling change (canvas or legacy dashboards)
+- Compilation errors on widgets due to a modeling change (both canvas and quick/legacy dashboards)
 - Dependency errors (ex. removed a field in a model, but the dataset or a canvas dashboard depend on it)
 
-### Content Validation
+### Reporting Validation
 
 TODO: Needs endpoint from holistics, has not been implemented
 
+**Please note:** this is different from Dashboard Validation!  
+
+[Reporting Validation](https://docs.holistics.io/docs/development/reporting-validation) matches functionality that holistics has for validating that code changes on your branch don't break already existing "Quick" or "Legacy" dashboards.  
+
+
 Intended to cover if a code change would break:
-- Legacy Dashboards
+- Quick / Legacy Dashboards (v3)
 - Alerts
 - Schedules
 - Embed Link
+
+### Dashboard Validation
+
+**Please note:** this is different from Reporting Validation!  
+
+Unlike the other validators, Dashboard Validation only applies to dashboards and code already published rather than testing a specific branch/commit.  It can be passed a list of dashboard IDs of any type of dashboard - a released canvas dashboard (v4) or a quick / legacy dashboard (v3) - and it will preload the dashboards (causing the SQL to be compiled and run), and reporting back any errors.  This is useful if holistics has released a change that broke pre-existing dashboards and you want to check a bunch of dashboards to see what's broken, or if a code change that breaks dashboards somehow got released without being caught.  
+
+Arguments for Dashboard Validation: 
+- `dashboard_ids` (required): comma separated list of the dashboard ID of either canvas dashboard or quick / legacy dashboards - this is the number in the URL when browsing a released dashboard
+
+Intended to cover:
+- Canvas Dashboards (v4)
+- Quick / Legacy Dashboards (v3)
 
 ## Tooling Options:
 
@@ -77,3 +97,6 @@ Publishes any code that is merged into the master branch.  To use, run `holistic
 - Add automated testing
 - Do we want to open-source this?  If so, it needs some more generalization and improvements, plus adding to pypi
 - Consider automatic retries
+- API version probably shouldn't be in the base URL, but this is a breaking change and should have versions implemented first 
+- Verbosity option added to cli instead of default debugging to file 
+- Add linting

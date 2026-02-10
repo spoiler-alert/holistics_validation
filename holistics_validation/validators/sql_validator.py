@@ -2,7 +2,6 @@ import re
 import traceback
 
 from holistics_validation.sql_engine_interfaces.bigquery_interface import BigQueryInterface
-from holistics_validation.holistics_api_client import retrieve_model_fields
 from holistics_validation.logger import logger
 from holistics_validation.exceptions import ReferencesUndefinedSQL, FailedValidation
 
@@ -21,20 +20,18 @@ def parse_overrides(override_string):
         return []
     override_list = override_string.split(',')
     if not all([":" in x for x in override_list]):
-        logger.error(f"Expected ':' in override to separate before and after values, but didn't find any in at least one of the overrides: {override_list}")
+        logger.error("Expected ':' in override to separate before and after values, but didn't find any in at least one of the overrides: %s", override_list)
         raise ValueError("Expected ':' in override to separate before and after values, but didn't find any in at least one of the overrides")
     override_list = [x.split(':') for x in override_string.split(',')]
     return override_list
 
 
-def run_sql_validation(sql_engine, credential_dict, holistics_base_url, holistics_api_key, holistics_project_id, commit_oid = None, branch_name = None, override_string = None):
+def run_sql_validation(sql_engine, credential_dict, holistics_api_client, holistics_project_id, commit_oid = None, branch_name = None, override_string = None):
 
     sql_interface_object = sql_engine_interfaces[sql_engine](credential_dict)
     overrides = parse_overrides(override_string)
 
-    data = retrieve_model_fields(
-        holistics_base_url = holistics_base_url,
-        holistics_api_key = holistics_api_key, 
+    data = holistics_api_client.retrieve_model_fields(
         holistics_project_id = holistics_project_id, 
         commit_oid=commit_oid,
         branch_name=branch_name
@@ -58,10 +55,10 @@ def run_sql_validation(sql_engine, credential_dict, holistics_base_url, holistic
     sql_interface_object.close_connection()
 
     if failure_creating_query:
-        logger.error(f"Failed creating the validation queries for the following models: {failure_creating_query}")
+        logger.error("Failed creating the validation queries for the following models: %s", failure_creating_query)
     
     if failure_validating_query:
-        logger.error(f"Failed validation query runs: {failure_validating_query}")
+        logger.error("Failed validation query runs: %s", failure_validating_query)
     
     if failure_creating_query or failure_validating_query: 
         raise FailedValidation()
@@ -72,9 +69,9 @@ class SQLValidator():
     def __init__(self, sql_interface_object):
         self.sql_interface_object = sql_interface_object
 
-    def start_validation(self, model, overrides = []):
+    def start_validation(self, model, overrides):
 
-        logger.debug(f"Starting validation of fields in model: {model['name']}")
+        logger.debug("Starting validation of fields in model: %s", model['name'])
         self.validation_jobs = {}
 
         if model['sql'] is None:
@@ -85,7 +82,7 @@ class SQLValidator():
                 full_table_name = full_table_name.replace(override[0], override[1])
         else:
             if "{%" in model['sql'] or '{{' in model['sql']:
-                logger.warning(f"We don't currently support validating parameterized queries or queries that reference other models, skipping validation for {model['name']}")
+                logger.warning("We don't currently support validating parameterized queries or queries that reference other models, skipping validation for %s", model['name'])
                 return
             short_table_name = 'temp_table'
             full_table_name = 'temp_table'
@@ -104,7 +101,7 @@ class SQLValidator():
                     'query': query, 
                     }
             else:
-                logger.warning(f"No {key} found for {model['name']}, skipping validation for dimensions")
+                logger.warning("No %s found for %s, skipping validation for dimensions", key, model['name'])
 
         return self.validation_jobs
 
@@ -119,10 +116,10 @@ class SQLValidator():
         elif out in self.field_dicts['measures']: 
             val = self.field_dicts['measures'][out]
         else:
-            logger.debug(f"Dimension dict: {self.field_dicts['dimensions']}")
-            logger.debug(f"Measure dict: {self.field_dicts['measures']}")
-            logger.debug(f"Match object: {match_object}")
-            logger.debug(f"Out: {out}")
+            logger.debug("Dimension dict: %s", self.field_dicts['dimensions'])
+            logger.debug("Measure dict: %s", self.field_dicts['measures'])
+            logger.debug("Match object: %s", match_object)
+            logger.debug("Out: %s", out)
             raise RuntimeError("The field is in neither the list of dimensions or measures, something unexpected went wrong")
         return val
 
@@ -141,18 +138,18 @@ class SQLValidator():
         aggregation_dict = self.sql_interface_object.aggregation_dict
 
         ## if a field is independent, generate the sql for it, otherwise put it in a dict of dependent fields to be handled after  
-        for j in ['dimensions', 'measures']:
-            for i in range(len(input_dict[j])):
-                if input_dict[j][i]['syntax'] == 'sql': 
-                    field_sql = input_dict[j][i]['sql']
-                    field_aggregation_type = input_dict[j][i]['aggregation_type']
-                    field_transform_type = input_dict[j][i]['transform_type']
-                    field_name = input_dict[j][i]['name']
+        for field_type in ['dimensions', 'measures']:
+            for field_meta in range(len(input_dict[field_type])):
+                if input_dict[field_type][field_meta]['syntax'] == 'sql': 
+                    field_sql = input_dict[field_type][field_meta]['sql']
+                    field_aggregation_type = input_dict[field_type][field_meta]['aggregation_type']
+                    field_transform_type = input_dict[field_type][field_meta]['transform_type']
+                    field_name = input_dict[field_type][field_meta]['name']
                     if field_transform_type:
                         raise NotImplementedError("We don't currently support transform type in the script, please either use something else or add it to the script") ## TODO: what is transform_type? 
-                    if j == 'dimensions' and field_aggregation_type:
+                    if field_type == 'dimensions' and field_aggregation_type:
                         raise RuntimeError("Aggregation type is not supported for dimensions") 
-                    if j == 'measures' and field_aggregation_type != 'custom' :
+                    if field_type == 'measures' and field_aggregation_type != 'custom' :
                         if field_aggregation_type in aggregation_dict:
                             field_sql = aggregation_dict[field_aggregation_type].format(field = field_sql)
                         else:
@@ -164,7 +161,7 @@ class SQLValidator():
                     if "{{" in field_sql:
                         dependent_fields[field_name] = field_sql
                     else:
-                        self.field_dicts[j][field_name] = field_sql
+                        self.field_dicts[field_type][field_name] = field_sql
 
             ## handling the dependent fields
             dependent_field_len = len(dependent_fields)
@@ -175,16 +172,16 @@ class SQLValidator():
                         out = re.findall(dependent_field_replace_regex, val)
                         if all( (x in self.field_dicts['dimensions'] or x in self.field_dicts['measures']) for x in out):
                             field_sql = re.sub(dependent_field_full_regex, self.replace_dependencies_funtion, val)
-                            self.field_dicts[j][key] = field_sql
+                            self.field_dicts[field_type][key] = field_sql
                             fields_taken_care_of.append(key)
-                    for i in fields_taken_care_of:
-                        del dependent_fields[i]
+                    for field_meta in fields_taken_care_of:
+                        del dependent_fields[field_meta]
                 else:
                     break
                 if len(dependent_fields) < dependent_field_len:
                     dependent_field_len = len(dependent_fields)
                 else:
-                    logger.error(f"For {model_name} {j}: The SQL fields remaining are dependent on either other fields that aren't defined in SQL (they could be defined as AQL, which would break) OR are dimensions dependent on measures: {dependent_fields}")
+                    logger.error("For %s %s: The SQL fields remaining are dependent on either other fields that aren't defined in SQL (they could be defined as AQL, which would break) OR are dimensions dependent on measures: %s", model_name, field_type, dependent_fields)
                     raise ReferencesUndefinedSQL("SQL fields remaining are dependent on either other fields that aren't defined in SQL (they could be defined as AQL, which would break) OR are dimensions dependent on measures")
 
         return self.field_dicts['dimensions'].values(), self.field_dicts['measures'].values()
@@ -195,7 +192,7 @@ class SQLValidator():
 
             validation_name = f"{val['name']} {key}"
             try:
-                logger.debug(f"Checking validation for {validation_name}")
+                logger.debug("Checking validation for %s", validation_name)
                 self.sql_interface_object.check_job_results(val['job'])
             except Exception as e:
                 logger.error("Validation query failed, query that was run is below:")
@@ -203,7 +200,6 @@ class SQLValidator():
                 logger.error(traceback.format_exc())
                 failures.append(validation_name)
             else:
-                logger.info(f"Successfully validated {validation_name}")
+                logger.info("Successfully validated %s", validation_name)
             
-        logger.info("Finished checking all validation queries")
         return failures
