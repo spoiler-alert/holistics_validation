@@ -67,9 +67,7 @@ class HolisticsAPIClient:
                 tries += 1
                 if tries > 100:
                     logger.error("Timeout after 100 attempts and no response that was a success / failure")
-                    raise TimeoutError(
-                        "Timing out after over 100 attempts and status of the job is still not in success / failure"
-                    )
+                    raise TimeoutError("Timing out after over 100 attempts and status of the job is still not in success / failure")
                 time.sleep(2)
 
         return status, data["job"]["last_error_log"]

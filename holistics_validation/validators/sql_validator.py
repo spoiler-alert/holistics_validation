@@ -24,9 +24,7 @@ def parse_overrides(override_string):
             "Expected ':' in override to separate before and after values, but didn't find any in at least one of the overrides: %s",
             override_list,
         )
-        raise ValueError(
-            "Expected ':' in override to separate before and after values, but didn't find any in at least one of the overrides"
-        )
+        raise ValueError("Expected ':' in override to separate before and after values, but didn't find any in at least one of the overrides")
     override_list = [x.split(":") for x in override_string.split(",")]
     return override_list
 
@@ -44,9 +42,7 @@ def run_sql_validation(
     with sql_engine_interfaces[sql_engine](credential_dict) as sql_interface_object:
         overrides = parse_overrides(override_string)
 
-        data = holistics_api_client.retrieve_model_fields(
-            holistics_project_id=holistics_project_id, commit_oid=commit_oid, branch_name=branch_name
-        )
+        data = holistics_api_client.retrieve_model_fields(holistics_project_id=holistics_project_id, commit_oid=commit_oid, branch_name=branch_name)
 
         model_validations = []
         failure_creating_query = []
@@ -103,14 +99,10 @@ class SQLValidator:
             for override in overrides:
                 cte = cte.replace(override[0], override[1])
 
-        dimensions, measures = self.create_field_dicts(
-            model["name"], model["dimensions"], model["measures"], short_table_name
-        )
+        dimensions, measures = self.create_field_dicts(model["name"], model["dimensions"], model["measures"], short_table_name)
         for key, val in {"dimensions": dimensions, "measures": measures}.items():
             if len(val) > 0:
-                query = self.sql_interface_object.base_queries[key].format(
-                    cte=cte, fields=",\n".join(val), table=full_table_name
-                )
+                query = self.sql_interface_object.base_queries[key].format(cte=cte, fields=",\n".join(val), table=full_table_name)
 
                 self.validation_jobs[key] = {
                     "name": model["name"],
@@ -137,9 +129,7 @@ class SQLValidator:
             logger.debug("Measure dict: %s", self.field_dicts["measures"])
             logger.debug("Match object: %s", match_object)
             logger.debug("Out: %s", out)
-            raise RuntimeError(
-                "The field is in neither the list of dimensions or measures, something unexpected went wrong"
-            )
+            raise RuntimeError("The field is in neither the list of dimensions or measures, something unexpected went wrong")
         return val
 
     def create_field_dicts(self, model_name, dimensions, measures, table_name):
@@ -226,6 +216,3 @@ class SQLValidator:
                 logger.info("Successfully validated %s", validation_name)
 
         return failures
-
-
-

@@ -59,9 +59,7 @@ def publish_parser_add_args(parser):
 
 
 def create_parser():
-    parser = argparse.ArgumentParser(
-        prog="holistics_validation", description="A command line tool for validating holistics code"
-    )
+    parser = argparse.ArgumentParser(prog="holistics_validation", description="A command line tool for validating holistics code")
 
     subparsers = parser.add_subparsers(title="Available sub-commands", dest="command")
 
@@ -109,9 +107,7 @@ def main():
         if args.command == "sql":
             run_sql_validation(
                 "bigquery",  ## TODO: shouldn't be hardcoded if generalize to other engines
-                {
-                    "bq_project_name": args.bq_project_name
-                },  ## TODO: shouldn't be hardcoded if generalize to other engines
+                {"bq_project_name": args.bq_project_name},  ## TODO: shouldn't be hardcoded if generalize to other engines
                 holistics_api_client=api_client,
                 holistics_project_id=args.holistics_project_id,
                 commit_oid=args.commit_oid,

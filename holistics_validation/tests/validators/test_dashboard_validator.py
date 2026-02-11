@@ -28,6 +28,7 @@ def test_run_dashboard_validator_no_dashboards_ids():
     with pytest.raises(ValueError):
         run_dashboard_validation(client, "")
 
+
 def test_run_dashboard_validator_multiple_dashboard_ids(caplog):
     client = FakeClient(job_completion_status="success")
     result = run_dashboard_validation(client, "123, 456,\n789")
@@ -35,6 +36,7 @@ def test_run_dashboard_validator_multiple_dashboard_ids(caplog):
     assert "Dashboard Validation for dashboard 123 completed successfully" in caplog.text
     assert "Dashboard Validation for dashboard 456 completed successfully" in caplog.text
     assert "Dashboard Validation for dashboard 789 completed successfully" in caplog.text
+
 
 def test_run_dashboard_validator_report_multiple_failures(caplog):
     client = FakeClient(job_completion_status="failure")

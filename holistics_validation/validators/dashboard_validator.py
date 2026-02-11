@@ -37,9 +37,7 @@ def run_dashboard_validation(holistics_api_client: HolisticsAPIClient, dashboard
             )
             failures.append(dashboard_id)
         else:
-            logger.error(
-                "Dashboard Validation for dashboard %s found an unexpected job status: '%s'", dashboard_id, status
-            )
+            logger.error("Dashboard Validation for dashboard %s found an unexpected job status: '%s'", dashboard_id, status)
             unknown_status.append(dashboard_id)
 
     if failures:

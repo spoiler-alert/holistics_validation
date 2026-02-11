@@ -34,3 +34,10 @@ holistics_validation = 'holistics_validation.cli:main'
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.ruff]
+line-length = 160
+exclude = [
+  ".cache",
+  "venv",
+  "__pycache__",
+]
