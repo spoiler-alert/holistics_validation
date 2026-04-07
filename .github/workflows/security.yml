@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+  pull-requests: write
+
+name: Security Scans
+
+
+on:  # yamllint disable-line rule:truthy
+  # we should scan for security issues on a schedule as well
+  schedule:
+    - cron: "30 12 * * 2"
+  workflow_dispatch: {}
+  push: {}
+
+jobs:
+  Secrets:
+    if: "github.actor != 'dependabot[bot]'"
+    runs-on: ubuntu-slim
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/mise-install
+        with:
+          packages: gitleaks
+          cache-name: secrets-ci
+      - name: run secret scanner
+        run: |
+          eval "$("$HOME/.local/bin/mise" activate bash)"
+          bash scripts/utils/secrets.sh
+
+  SAST:
+    runs-on: ubuntu-slim
+    if: "github.actor != 'dependabot[bot]'"
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v6
+      - uses: ./.github/actions/mise-install
+        with:
+          packages: semgrep
+          cache-name: semgrep-ci
+      - name: SAST checks
+        run: |
+          eval "$("$HOME/.local/bin/mise" activate bash)"
+          bash scripts/utils/sast.sh
