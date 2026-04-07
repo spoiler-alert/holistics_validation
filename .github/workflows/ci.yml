@@ -10,9 +10,6 @@ on:  # yamllint disable-line rule:truthy
       - labeled
       - synchronize
 
-env:
-  GOOGLE_PROJECT_ID: spoileralert-219215
-
 jobs:
   changed-files:
     name: Get Changed files
