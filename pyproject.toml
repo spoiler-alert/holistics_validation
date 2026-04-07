@@ -1,9 +1,9 @@
-[tool.poetry]
+[project]
 name = 'holistics_validation'
 version = '1.1.0'
 description = 'A tool for validating holistics code'
 readme = "README.md"
-authors = ["Spoiler Alert"]
+requires-python = '>=3.12'
 keywords = [
     "Holistics",
     "AML",
@@ -13,14 +13,16 @@ keywords = [
     "validation",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-google-cloud-bigquery = '^3.17'
+dependencies = [
+    "google-cloud-bigquery>=3.41.0",
+]
 
-[tool.poetry.scripts]
+[tool.uv]
+package = true
+exclude-newer = "7 days"
+
+[project.scripts]
 holistics_validation = 'holistics_validation.cli:main'
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
+[tool.setuptools]
+py-modules = ["holistics_validation"]

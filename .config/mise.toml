@@ -1,0 +1,8 @@
+[tools]
+python = '3.14'
+uv = 'latest'
+ruff = 'latest'
+actionlint = 'latest'
+markdownlint-cli2 = 'latest'
+yamllint = 'latest'
+shellcheck = 'latest'
