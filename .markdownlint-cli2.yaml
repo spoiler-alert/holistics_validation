@@ -1,0 +1,19 @@
+config:
+  # unordered list indentation
+  MD007: false
+  # line length
+  MD013: false
+  # no inline html
+  MD033: false
+  # no empty links
+  MD042: false
+  # link fragments
+  MD051: false
+fix: false
+gitignore: true
+globs:
+  - '**/*.md'
+ignores:
+  - "**/node_modules/**"
+  - "/.github/pull_request_template.md"
+  - "**/vendor/**"
