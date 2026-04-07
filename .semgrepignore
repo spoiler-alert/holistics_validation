@@ -1,0 +1,46 @@
+# general
+.git/
+coverage/
+**/coverage/
+
+# local dev
+.vscode/
+**/.nicegui
+.nicegui
+.idea/
+
+# node
+.yarn/
+.npm/
+**/.next/**
+.next/
+**/node_modules/**
+node_modules/
+**/.terraform/**
+.pnp*
+**/.turbo/**
+.turbo/
+dist/
+**/dist/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+next-env.d.ts
+test-results/
+playwright-report/
+
+# python
+*.pyc
+**/*.pyc
+**/__pycache__/
+**/.venv/
+.venv/
+**/venv/
+venv/
+**/.mypy_cache/
+.mypy_cache/
+**/.pytest_cache/
+.pytest_cache/
+
+.mongo_data/
+tools/secret-collector/vendor
