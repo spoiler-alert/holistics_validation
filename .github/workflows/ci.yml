@@ -174,7 +174,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/mise-install
         with:
-          packages: ruff
+          packages: ruff ty
           cache-name: python-ci
       - name: Ruff Format
         run: |
