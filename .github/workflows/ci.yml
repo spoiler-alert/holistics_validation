@@ -106,6 +106,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - run: |
+          sudo apt-get update -qq
           sudo apt-get install -yqq jq
           scripts/utils/check-json.sh
 
@@ -174,7 +175,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/mise-install
         with:
-          packages: ruff ty
+          packages: ruff ty uv
           cache-name: python-ci
       - name: Ruff Format
         run: |
