@@ -17,6 +17,8 @@ jobs:
   changed-files:
     name: Get Changed files
     outputs:
+      shell: ${{ steps.changed-files.outputs.shell_any_modified == 'true' }}
+      shell_files: ${{ steps.changed-files.outputs.shell_all_changed_files }}
       gh_action_files: ${{ steps.changed-files.outputs.gh_actions_all_changed_files }}
       gh_actions: ${{ steps.changed-files.outputs.gh_actions_any_modified == 'true' }}
       json: ${{ steps.changed-files.outputs.json_any_modified == 'true' }}
@@ -50,6 +52,16 @@ jobs:
               - '*.json'
               - '.*.json'
               - .github/workflows/ci.yml
+            shell:
+              - '**/*.sh'
+              - '**/.*.sh'
+              - '.*.sh'
+              - '*.sh'
+              - '**/*.zsh'
+              - '**/.*.zsh'
+              - '*.zsh'
+              - '.*.zsh'
+              - .github/workflows/ci.yml
             markdown:
               - '**/*.md'
               - '*.md'
@@ -64,6 +76,25 @@ jobs:
               - '.*.y*ml'
               - '*.y*ml'
               - .github/workflows/ci.yml
+
+  shelllint:
+    name: Shell Lint
+    needs:
+      - changed-files
+    runs-on: ubuntu-slim
+    if: "(needs.changed-files.outputs.shell == 'true' ||
+         github.event_name == 'workflow_dispatch')"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/mise-install
+        with:
+          packages: shellcheck
+          cache-name: shellcheck-ci
+      - name: Shellcheck
+        run: |
+          eval "$("$HOME/.local/bin/mise" activate bash)"
+          # shellcheck disable=SC2046
+          shellcheck -s bash -x $(find . -type f \( -name "*.sh" -o -name "*.zsh" \) -print0 | xargs -0)
 
   jsonlint:
     name: JSON Linting
@@ -153,3 +184,7 @@ jobs:
         run: |
           eval "$("$HOME/.local/bin/mise" activate bash)"
           ruff check .
+      - name: Type checking
+        run: |
+          eval "$("$HOME/.local/bin/mise" activate bash)"
+          scripts/utils/python-type-check.sh

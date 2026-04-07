@@ -136,10 +136,10 @@ class SQLValidator:
 
     def replace_source_funtion(self, match_object):
         out = re.search(source_field_replace_regex, match_object.group(0))
-        return f"{self.table_name}.{out.group(0)}"
+        return f"{self.table_name}.{out.group(0)}"  # ty: ignore[unresolved-attribute]
 
     def replace_dependencies_funtion(self, match_object):
-        out = re.search(dependent_field_replace_regex, match_object.group(0)).group(0)
+        out = re.search(dependent_field_replace_regex, match_object.group(0)).group(0)  # ty: ignore[unresolved-attribute]
         if out in self.field_dicts["dimensions"]:
             val = self.field_dicts["dimensions"][out]
         elif out in self.field_dicts["measures"]:
