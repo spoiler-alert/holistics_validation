@@ -102,9 +102,11 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
+      - uses: ./.github/actions/mise-install
+        with:
+          packages: jq
+          cache-name: jq-ci
       - run: |
-          sudo apt-get update -qq
-          sudo apt-get install -yqq jq
           scripts/utils/check-json.sh
 
   yamllint:
