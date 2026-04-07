@@ -9,11 +9,17 @@ pushd "$(git rev-parse --show-toplevel)" > /dev/null || exit 1
 . scripts/utils/.library.sh
 
 if [[ $# -eq 0 ]]; then
+	set +e
 	FILES=$(git_files | grep "json$" | xargs)
+	set -e
 else
 	FILES=$*
 fi
 
+if [[ -z "${FILES}" ]]; then
+	echo "No JSON files found."
+	exit 0
+fi
 exit_code=0
 for fn in ${FILES}; do
 	echo "Checking ${fn}..."
