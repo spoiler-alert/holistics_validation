@@ -198,16 +198,8 @@ jobs:
       - uses: ./.github/actions/mise-install
         with:
           packages: uv
-          cache-name: python-ci
-      - name: Ruff Format
+          cache-name: python-test-ci
+      - name: Python Tests
         run: |
           eval "$("$HOME/.local/bin/mise" activate bash)"
-          ruff format .
-      - name: Ruff Check
-        run: |
-          eval "$("$HOME/.local/bin/mise" activate bash)"
-          ruff check .
-      - name: Type checking
-        run: |
-          eval "$("$HOME/.local/bin/mise" activate bash)"
-          scripts/utils/python-type-check.sh
+          uv run pytest
