@@ -1,5 +1,5 @@
 import argparse
-import traceback
+import logging
 
 from holistics_validation.holistics_api_client import HolisticsAPIClient
 from holistics_validation.validators.sql_validator import run_sql_validation
@@ -10,10 +10,9 @@ from holistics_validation.logger import logger
 
 
 def generic_parser_add_args(parser):
-    parser.add_argument(
-        "--holistics_base_url", default="https://us.holistics.io/api/v2/"
-    )
+    parser.add_argument("--holistics_base_url", default="https://us.holistics.io/api/v2/")
     parser.add_argument("--holistics_api_key", required=True)
+    parser.add_argument("-v", "--verbose", required=False, action="store_true")
 
 
 def sql_parser_add_args(parser):
@@ -60,10 +59,7 @@ def publish_parser_add_args(parser):
 
 
 def create_parser():
-    parser = argparse.ArgumentParser(
-        prog="holistics_validation",
-        description="A command line tool for validating holistics code",
-    )
+    parser = argparse.ArgumentParser(prog="holistics_validation", description="A command line tool for validating holistics code")
 
     subparsers = parser.add_subparsers(title="Available sub-commands", dest="command")
 
@@ -73,9 +69,7 @@ def create_parser():
     )
     sql_parser_add_args(sql_parser)
 
-    aml_parser = subparsers.add_parser(
-        "aml", help="Validates AML for the given commit oid and branch"
-    )
+    aml_parser = subparsers.add_parser("aml", help="Validates AML for the given commit oid and branch")
     aml_parser_add_args(aml_parser)
 
     reporting_parser = subparsers.add_parser(
@@ -84,9 +78,7 @@ def create_parser():
     )
     reporting_parser_add_args(reporting_parser)
 
-    dashboard_parser = subparsers.add_parser(
-        "dashboard", help="Validates if the given dashboard(s) are broken"
-    )
+    dashboard_parser = subparsers.add_parser("dashboard", help="Validates if the given dashboard(s) are broken")
     dashboard_parser_add_args(dashboard_parser)
 
     publish_parser = subparsers.add_parser("publish", help="Publishes master branch")
@@ -96,26 +88,25 @@ def create_parser():
 
 
 def main():
-    try:
-        parser = create_parser()
-        args = parser.parse_args()
+    parser = create_parser()
+    args = parser.parse_args()
 
-        if args.command == "reporting":
-            raise NotImplementedError(
-                "Waiting for for holistics to add an API endpoint for reporting validation"
-            )
+    if args.verbose:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
 
-        api_client = HolisticsAPIClient(
-            holistics_base_url=args.holistics_base_url,
-            holistics_api_key=args.holistics_api_key,
-        )
+    if args.command == "reporting":
+        raise NotImplementedError("Waiting for for holistics to add an API endpoint for reporting validation")
 
+    with HolisticsAPIClient(
+        holistics_base_url=args.holistics_base_url,
+        holistics_api_key=args.holistics_api_key,
+    ) as api_client:
         if args.command == "sql":
             run_sql_validation(
                 "bigquery",  ## TODO: shouldn't be hardcoded if generalize to other engines
-                {
-                    "bq_project_name": args.bq_project_name
-                },  ## TODO: shouldn't be hardcoded if generalize to other engines
+                {"bq_project_name": args.bq_project_name},  ## TODO: shouldn't be hardcoded if generalize to other engines
                 holistics_api_client=api_client,
                 holistics_project_id=args.holistics_project_id,
                 commit_oid=args.commit_oid,
@@ -131,20 +122,12 @@ def main():
             )
 
         if args.command == "dashboard":
-            run_dashboard_validation(
-                holistics_api_client=api_client, dashboard_ids=args.dashboard_ids
-            )
+            run_dashboard_validation(holistics_api_client=api_client, dashboard_ids=args.dashboard_ids)
 
         if args.command == "publish":
             run_publish_aml(
                 holistics_api_client=api_client,
             )
-
-    except Exception as e:
-        logger.error(
-            traceback.format_exc()
-        )  # ensures the error is logged in the log file and not just the console
-        raise e
 
 
 if __name__ == "__main__":

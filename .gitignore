@@ -3,3 +3,7 @@ logs
 *.log
 .DS_Store
 *.egg-info
+.ruff_cache
+.pytest_cache
+.mypy_cache
+.venv

@@ -1,11 +1,10 @@
-from holistics_validation.logger import logger
 from holistics_validation.exceptions import FailedValidation, UnexpectedJobStatus
 from holistics_validation.holistics_api_client import HolisticsAPIClient
+from holistics_validation.logger import logger
+from holistics_validation.tests.utils import FakeClient
 
 
-def run_dashboard_validation(
-    holistics_api_client: HolisticsAPIClient, dashboard_ids: str
-) -> bool:
+def run_dashboard_validation(holistics_api_client: HolisticsAPIClient | FakeClient, dashboard_ids: str) -> bool:
     """
     A function that takes in a holistics api client object as well as
     dashboard_ids (a string where each dashboard ID is separated by commas,
@@ -16,16 +15,13 @@ def run_dashboard_validation(
 
     dashboard_list = [d.strip() for d in dashboard_ids.split(",") if d.strip()]
     if not dashboard_list:
-        raise ValueError(
-            "dashboard_ids must contain at least one non-empty dashboard id"
-        )
+        raise ValueError("dashboard_ids must contain at least one non-empty dashboard id")
 
     # starts all the jobs since waiting for the queries might take quite a while
     dashboard_job_dict = {}
     for dashboard_id in dashboard_list:
-        dashboard_job_dict[dashboard_id] = holistics_api_client.preload_dashboard(
-            dashboard_id=dashboard_id
-        )
+        logger.debug("Attempting to load dashboard ID %s", dashboard_id)
+        dashboard_job_dict[dashboard_id] = holistics_api_client.preload_dashboard(dashboard_id=dashboard_id)
 
     # checks jobs one by one - it's possible
     failures = []
@@ -33,10 +29,7 @@ def run_dashboard_validation(
     for dashboard_id, job_id in dashboard_job_dict.items():
         status, error_message = holistics_api_client.check_job_completion(job_id)
         if status == "success":
-            logger.info(
-                "Dashboard Validation for dashboard %s completed successfully",
-                dashboard_id,
-            )
+            logger.info("Dashboard Validation for dashboard %s completed successfully", dashboard_id)
         elif status == "failure":
             logger.error(
                 "Dashboard Validation for dashboard %s failed with the following error message: %s",
@@ -45,11 +38,7 @@ def run_dashboard_validation(
             )
             failures.append(dashboard_id)
         else:
-            logger.error(
-                "Dashboard Validation for dashboard %s found an unexpected job status: '%s'",
-                dashboard_id,
-                status,
-            )
+            logger.error("Dashboard Validation for dashboard %s found an unexpected job status: '%s'", dashboard_id, status)
             unknown_status.append(dashboard_id)
 
     if failures:

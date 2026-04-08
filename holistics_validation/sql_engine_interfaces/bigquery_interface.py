@@ -14,7 +14,7 @@ class BigQueryInterface:
             "dimensions": """
                 {cte}
 
-                SELECT 
+                SELECT
                 {fields}
 
                 FROM {table}
@@ -25,8 +25,8 @@ class BigQueryInterface:
             "measures": """
                 {cte}
 
-                SELECT 
-                1, 
+                SELECT
+                1,
                 {fields}
 
                 FROM {table}
@@ -57,13 +57,14 @@ class BigQueryInterface:
             "count distinct": "COUNT( DISTINCT {field} )",
         }
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type=None, exc_value=None, traceback=None):
+        pass  # BQ doesn't need to close the connection
+
     def start_job(self, query_string):
-        return self.client.query(
-            query_string
-        )  # returns the job, the job still needs to be validated
+        return self.client.query(query_string)  # returns the job, the job still needs to be validated
 
     def check_job_results(self, job):
         return job.result()
-
-    def close_connection(self):
-        pass  # BQ doesn't need to close the connection

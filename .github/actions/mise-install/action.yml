@@ -10,6 +10,9 @@ inputs:
     required: false
     default: ${{ runner.os }}-mise-install
     description: "Allows for a subset of installation candidates (or custom installs ignoring the config file)"
+  uv-sync:
+    required: false
+    description: Run a frozen sync of uv during setup
   pip-requirements:
     required: false
     description: install packages from a requirements.txt file
@@ -78,6 +81,16 @@ runs:
           mise reshim
         fi
 
+    - name: uv sync
+      shell: bash
+      env:
+        UV_SYNC: ${{ inputs.uv-sync }}
+      run: |
+        if [[ "${UV_SYNC}" == "true" ]]; then
+          eval "$($HOME/.local/bin/mise activate bash)"
+          uv sync --frozen
+          mise reshim
+        fi
     - name: cache save
       if: steps.cache-restore.outputs.cache-hit != 'true'
       uses: actions/cache/save@v5

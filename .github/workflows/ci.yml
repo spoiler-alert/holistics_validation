@@ -185,3 +185,29 @@ jobs:
         run: |
           eval "$("$HOME/.local/bin/mise" activate bash)"
           scripts/utils/python-type-check.sh
+
+  python-testing:
+    name: Python Testing
+    needs:
+      - changed-files
+    runs-on: ubuntu-slim
+    if: "(needs.changed-files.outputs.python == 'true' ||
+         github.event_name == 'workflow_dispatch')"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/mise-install
+        with:
+          packages: uv
+          cache-name: python-ci
+      - name: Ruff Format
+        run: |
+          eval "$("$HOME/.local/bin/mise" activate bash)"
+          ruff format .
+      - name: Ruff Check
+        run: |
+          eval "$("$HOME/.local/bin/mise" activate bash)"
+          ruff check .
+      - name: Type checking
+        run: |
+          eval "$("$HOME/.local/bin/mise" activate bash)"
+          scripts/utils/python-type-check.sh
