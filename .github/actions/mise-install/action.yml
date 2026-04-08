@@ -80,7 +80,6 @@ runs:
           pip install --progress-bar off ${PACKAGES}
           mise reshim
         fi
-
     - name: uv sync
       shell: bash
       env:
@@ -91,6 +90,7 @@ runs:
           uv sync --frozen
           mise reshim
         fi
+
     - name: cache save
       if: steps.cache-restore.outputs.cache-hit != 'true'
       uses: actions/cache/save@v5

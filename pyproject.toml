@@ -24,9 +24,6 @@ dependencies = [
 package = true
 exclude-newer = "7 days"
 
-[tool.setuptools]
-py-modules = ["holistics_validation"]
-
 [dependency-groups]
 dev = [
     "pytest>=9.0.2",

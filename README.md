@@ -9,15 +9,6 @@ You can install from GitHub by doing either of the following:
 
 For now, we don't support multiple versions so doing the above will pull the most up-to-date version from the main branch.
 
-## Local Setup
-
-Initial setup on OS X and Linux can be achieved with just running `scripts/bootstrap.sh` after cloning the repo. This script should configure all local dependencies and ensure your system is ready to use the monorepo.
-
-> `scripts/bootstrap.sh` only needs to be run infrequently. Daily work in the repo should _not_ require running `scripts/bootstrap.sh`.
-> `scripts/bootstrap.sh` has only run successfully if a notification akin to "Bootstrap run completed at" appears on the screen.
-
-This repo follows the [Scripts to Rule Them All](https://github.blog/engineering/engineering-principles/scripts-to-rule-them-all/) (STRTA) pattern. The idea being that relatively simple scripts can be configured that ensure a user's machine is able to effectively use a repo in a consistent manner.
-
 ## General Usage
 
 Run `holistics_validation` followed by the type of validation or job you want to run.  Arguments that can be used for all types of validation:
@@ -111,7 +102,12 @@ Publishes any code that is merged into the master branch.  To use, run `holistic
 
 ### Set-up
 
-[Install mise](https://mise.jdx.dev/installing-mise.html) and `mise up` to ensure dependencies are available and up to date.
+Initial setup on OS X and Linux can be achieved with just running `scripts/bootstrap.sh` after cloning the repo. This script should configure all local dependencies and ensure your system is ready to use the monorepo.
+
+> `scripts/bootstrap.sh` only needs to be run infrequently. Daily work in the repo should _not_ require running `scripts/bootstrap.sh`.
+> `scripts/bootstrap.sh` has only run successfully if a notification akin to "Bootstrap run completed at" appears on the screen.
+
+This repo follows the [Scripts to Rule Them All](https://github.blog/engineering/engineering-principles/scripts-to-rule-them-all/) (STRTA) pattern. The idea being that relatively simple scripts can be configured that ensure a user's machine is able to effectively use a repo in a consistent manner.
 
 ### Linting, Formatting, and Type Checks
 
@@ -125,7 +121,7 @@ Publishes any code that is merged into the master branch.  To use, run `holistic
 
 ### WIP Installation
 
-- Run `uv sync` to install your work in progress so you can attempt using the cli functionality.
+- Run `uv run holistics_validation --help` to test the cli functionality.
 
 ## TODO
 
