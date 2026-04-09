@@ -42,22 +42,24 @@ if [[ "${SYSTEM}" == "darwin" ]]; then
 	echo "You may be prompted for your password during this script..."
 	# no-op to cache privileges
 	sudo -l > /dev/null
-	if ! command -v brew &> /dev/null; then
-		echo "Homebrew not found. Installing Homebrew..."
-		# nosemgrep: bash.curl.security.curl-pipe-bash.curl-pipe-bash
-		NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-		echo "Homebrew installed successfully."
-	else
-		brew update
-	fi
-	brew install mise
-	set +e
-	# shellcheck disable=SC2016
-	if ! grep -q 'eval "$(mise activate zsh --shims)"' "$HOME/.zshrc"; then
+	if ! command -v mise &> /dev/null; then
+		if ! command -v brew &> /dev/null; then
+			echo "Homebrew not found. Installing Homebrew..."
+			# nosemgrep: bash.curl.security.curl-pipe-bash.curl-pipe-bash
+			NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+			echo "Homebrew installed successfully."
+		else
+			brew update
+		fi
+		brew install mise
+		set +e
 		# shellcheck disable=SC2016
-		echo 'eval "$(mise activate zsh --shims)"' >> "$HOME/.zshrc"
+		if ! grep -q 'eval "$(mise activate zsh --shims)"' "$HOME/.zshrc"; then
+			# shellcheck disable=SC2016
+			echo 'eval "$(mise activate zsh --shims)"' >> "$HOME/.zshrc"
+		fi
+		eval "$(mise activate zsh --shims)"
 	fi
-	eval "$(mise activate zsh --shims)"
 	# shellcheck disable=SC2016
 	if ! grep -q 'autoload -Uz compinit && compinit' "$HOME/.zshrc"; then
 		echo 'autoload -Uz compinit && compinit' >> "$HOME/.zshrc"
