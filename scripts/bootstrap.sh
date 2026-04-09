@@ -42,11 +42,6 @@ if [[ "${SYSTEM}" == "darwin" ]]; then
 	echo "You may be prompted for your password during this script..."
 	# no-op to cache privileges
 	sudo -l > /dev/null
-	processor_brand="$(sudo /usr/sbin/sysctl -n machdep.cpu.brand_string)"
-	if [[ "${processor_brand}" == *"Apple"* ]]; then
-		echo "Enabling rosetta2 for multiarch docker support..."
-		softwareupdate --install-rosetta --agree-to-license > /dev/null
-	fi
 	if ! command -v brew &> /dev/null; then
 		echo "Homebrew not found. Installing Homebrew..."
 		# nosemgrep: bash.curl.security.curl-pipe-bash.curl-pipe-bash
