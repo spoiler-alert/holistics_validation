@@ -111,6 +111,9 @@ fi
 echo "General Configuration..."
 
 mise upgrade --yes
+mise prune --yes
+
+uv sync
 
 echo "Pre-commit hooks..."
 lefthook install -f
