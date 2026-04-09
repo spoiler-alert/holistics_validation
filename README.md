@@ -129,4 +129,3 @@ This repo follows the [Scripts to Rule Them All](https://github.blog/engineering
 - Optional dependencies for SQL queries
 - Versions
 - API version probably shouldn't be in the base URL, but this is a breaking change and should have versions implemented first
-- Do we want to open-source this?  If so, it needs some more generalization and improvements, plus adding to pypi
