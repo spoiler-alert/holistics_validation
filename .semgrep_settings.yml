@@ -1,0 +1,40 @@
+# additional rulesets can be found here: https://semgrep.dev/explore
+rulesets:
+  - p/ci
+  - p/command-injection
+  - p/comment
+  - p/cwe-top-25
+  - p/docker
+  - p/dockerfile
+  - p/docker-compose
+  - p/github-actions
+  - p/golang
+  - p/javascript
+  - p/jwt
+  - p/lockfiles
+  - p/nodejs
+  - p/owasp-top-ten
+  - p/python
+  - p/react
+  - p/security-audit
+  - p/shadow-ai
+  - p/sql-injection
+  - p/supply-chain
+  - p/terraform
+  - p/typescript
+  - p/xss
+excluded:
+  # we don't directly host any containers, so ensuring an un-privileged user is extra work (currently)
+  - dockerfile.security.missing-user.missing-user
+  - dockerfile.security.missing-user-entrypoint.missing-user-entrypoint
+  # similar to ignoring USER in dockerfiles, we ignore privileges and writable filesystems in compose files
+  - yaml.docker-compose.security.no-new-privileges.no-new-privileges
+  - yaml.docker-compose.security.writable-filesystem-service.writable-filesystem-service
+  # hard to properly comment this out when it shows up
+  - html.security.audit.missing-integrity.missing-integrity
+  # this is a weird one, and I don't see the benefit to it
+  - ai.generic.detect-generic-ai-api.detect-generic-ai-api
+  # it's true we shouldn't do this, but 'eval' is actually useful, and this rule is annoying
+  - ai.ai-best-practices.hooks-no-input-validation.hooks-no-input-validation-bash.hooks-no-input-validation-bash
+  - ai.ai-best-practices.hooks-no-input-validation.hooks-no-input-validation.hooks-no-input-validation-bash
+  - ai.ai-best-practices.hooks-unquoted-variable.hooks-unquoted-variable.hooks-unquoted-variable-bash-eval

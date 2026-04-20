@@ -1,9 +1,10 @@
 from holistics_validation.exceptions import FailedValidation, UnexpectedJobStatus
 from holistics_validation.holistics_api_client import HolisticsAPIClient
 from holistics_validation.logger import logger
+from holistics_validation.tests.utils import FakeClient
 
 
-def run_dashboard_validation(holistics_api_client: HolisticsAPIClient, dashboard_ids: str) -> bool:
+def run_dashboard_validation(holistics_api_client: HolisticsAPIClient | FakeClient, dashboard_ids: str) -> bool:
     """
     A function that takes in a holistics api client object as well as
     dashboard_ids (a string where each dashboard ID is separated by commas,

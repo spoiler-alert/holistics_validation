@@ -1,0 +1,101 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-action.json
+name: Install mise (and requested packages)
+description: Install our dependency manager and cache results to improve performance
+inputs:
+  packages:
+    required: false
+    default: ''
+    description: "Allows for a subset of installation candidates (or custom installs ignoring the config file)"
+  cache-name:
+    required: false
+    default: ${{ runner.os }}-mise-install
+    description: "Allows for a subset of installation candidates (or custom installs ignoring the config file)"
+  uv-sync:
+    required: false
+    description: Run a frozen sync of uv during setup
+  pip-requirements:
+    required: false
+    description: install packages from a requirements.txt file
+  pip-requirements-path:
+    required: false
+    default: requirements.txt
+    description: (relative) path to requirements.txt file to install
+  pip-packages:
+    required: false
+    description: Additional packages to install with pip
+
+runs:
+  using: composite
+  steps:
+    - name: restore cache
+      id: cache-restore
+      uses: actions/cache/restore@v5
+      with:
+        path: |
+          ~/.cache
+          ~/.local
+        key: ${{ inputs.cache-name }}
+
+    - name: install mise
+      shell: bash
+      run: |
+        curl -SsLf https://mise.run | sh > /dev/null 2>&1
+        "$HOME/.local/bin/mise" trust --quiet .config/mise.toml
+
+    - name: install packages
+      shell: bash
+      env:
+        PACKAGES: ${{ inputs.packages }}
+      run: |
+        eval "$($HOME/.local/bin/mise activate bash)"
+        if [[ -n "${PACKAGES}" ]]; then
+          mise up ${PACKAGES}
+        else
+          # default to installing all packages
+          mise up
+        fi
+        mise reshim
+
+    # additional python packages to cache
+    - name: install pip requirements
+      shell: bash
+      env:
+        REQUIREMENTS: ${{ inputs.pip-requirements }}
+        REQUIREMENTS_TXT_PATH: ${{ inputs.pip-requirements-path }}
+      run: |
+        if [[ "${REQUIREMENTS}" == "true" ]]; then
+          eval "$($HOME/.local/bin/mise activate bash)"
+          pip install --progress-bar off -r "${REQUIREMENTS_TXT_PATH}"
+          mise reshim
+        fi
+    - name: install pip packages
+      shell: bash
+      env:
+        PACKAGES: ${{ inputs.pip-packages }}
+      run: |
+        if [[ -n "${PACKAGES}" ]]; then
+          mkdir $HOME/.ssh
+          ssh-keyscan -H github.com >> "$HOME/.ssh/known_hosts"
+          eval "$($HOME/.local/bin/mise activate bash)"
+          pip install --progress-bar off ${PACKAGES}
+          mise reshim
+        fi
+    - name: uv sync
+      shell: bash
+      env:
+        UV_SYNC: ${{ inputs.uv-sync }}
+      run: |
+        if [[ "${UV_SYNC}" == "true" ]]; then
+          eval "$($HOME/.local/bin/mise activate bash)"
+          uv sync --frozen
+          mise reshim
+        fi
+
+    - name: cache save
+      if: steps.cache-restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v5
+      with:
+        path: |
+          ~/.cache
+          ~/.local
+        key: ${{ steps.cache-restore.outputs.cache-primary-key }}

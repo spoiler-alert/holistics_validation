@@ -3,6 +3,7 @@ name = 'holistics_validation'
 version = '1.2.0'
 description = 'A tool for validating holistics code'
 readme = "README.md"
+requires-python = ">=3.14"
 authors = [
     {name = "Spoiler Alert"}
 ]
@@ -14,25 +15,22 @@ keywords = [
     "testing",
     "validation",
 ]
-requires-python = ">=3.11"
+
 dependencies = [
-    "google-cloud-bigquery>=3.40.0",
+    "google-cloud-bigquery>=3.41.0",
 ]
+
+[tool.uv]
+package = true
+exclude-newer = "7 days"
 
 [dependency-groups]
 dev = [
-    "mypy>=1.19.1",
     "pytest>=9.0.2",
-    "ruff>=0.15.0",
-    "types-requests>=2.32.4.20260107",
 ]
 
 [project.scripts]
 holistics_validation = 'holistics_validation.cli:main'
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
 
 [tool.ruff]
 line-length = 160

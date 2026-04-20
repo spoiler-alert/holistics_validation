@@ -14,7 +14,7 @@ class BigQueryInterface:
             "dimensions": """
                 {cte}
 
-                SELECT 
+                SELECT
                 {fields}
 
                 FROM {table}
@@ -25,8 +25,8 @@ class BigQueryInterface:
             "measures": """
                 {cte}
 
-                SELECT 
-                1, 
+                SELECT
+                1,
                 {fields}
 
                 FROM {table}

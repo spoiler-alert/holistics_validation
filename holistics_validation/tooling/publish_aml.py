@@ -1,9 +1,10 @@
 from holistics_validation.exceptions import FailedPublish, UnexpectedJobStatus
 from holistics_validation.holistics_api_client import HolisticsAPIClient
 from holistics_validation.logger import logger
+from holistics_validation.tests.utils import FakeClient
 
 
-def run_publish_aml(holistics_api_client: HolisticsAPIClient) -> bool:
+def run_publish_aml(holistics_api_client: HolisticsAPIClient | FakeClient) -> bool:
     """
     A function that takes in a holistics api client object and publishes
     the master branch for the corresponding holistics environment

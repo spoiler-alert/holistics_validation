@@ -1,9 +1,10 @@
 from holistics_validation.exceptions import FailedValidation, UnexpectedJobStatus
 from holistics_validation.holistics_api_client import HolisticsAPIClient
 from holistics_validation.logger import logger
+from holistics_validation.tests.utils import FakeClient
 
 
-def run_aml_validation(holistics_api_client: HolisticsAPIClient, commit_oid: str, branch_name: str) -> bool:
+def run_aml_validation(holistics_api_client: HolisticsAPIClient | FakeClient, commit_oid: str, branch_name: str) -> bool:
     """
     A function that takes in a holistics api client object as well as
     commit_oid and branch_name (in the form "origin/{branch_name}") and

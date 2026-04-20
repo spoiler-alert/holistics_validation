@@ -27,10 +27,10 @@ def test_run_aml_validation_unexpected_status_raises_unexpected_job_status():
 def test_run_aml_validation_bad_or_missing_commit_oid():
     client = FakeClient(job_completion_status="success")
     with pytest.raises(TypeError):
-        run_aml_validation(client, branch_name="branch_name")
+        run_aml_validation(client, branch_name="branch_name")  # ty: ignore[missing-argument]
 
 
 def test_run_aml_validation_no_branch_name():
     client = FakeClient(job_completion_status="success")
     with pytest.raises(TypeError):
-        run_aml_validation(client, commit_oid="commit_oid")
+        run_aml_validation(client, commit_oid="commit_oid")  # ty: ignore[missing-argument]

@@ -1,0 +1,205 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Validate/Test files
+
+on:  # yamllint disable-line rule:truthy
+  workflow_dispatch: {}
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - labeled
+      - synchronize
+
+jobs:
+  changed-files:
+    name: Get Changed files
+    outputs:
+      shell: ${{ steps.changed-files.outputs.shell_any_modified == 'true' }}
+      shell_files: ${{ steps.changed-files.outputs.shell_all_changed_files }}
+      gh_action_files: ${{ steps.changed-files.outputs.gh_actions_all_changed_files }}
+      gh_actions: ${{ steps.changed-files.outputs.gh_actions_any_modified == 'true' }}
+      json: ${{ steps.changed-files.outputs.json_any_modified == 'true' }}
+      json_files: ${{ steps.changed-files.outputs.json_all_changed_files }}
+      markdown: ${{ steps.changed-files.outputs.markdown_any_modified == 'true' }}
+      markdown_files: ${{ steps.changed-files.outputs.markdown_all_changed_files }}
+      python: ${{ steps.changed-files.outputs.python_any_modified == 'true' }}
+      python_files: ${{ steps.changed-files.outputs.python_all_changed_files }}
+      yaml: ${{ steps.changed-files.outputs.yaml_any_modified == 'true' }}
+      yaml_files: ${{ steps.changed-files.outputs.yaml_all_changed_files }}
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0  # Fetch Depth 0 == Pull the whole repo and all history
+          set-safe-directory: false
+          show-progress: false
+      - uses: tj-actions/changed-files@22103cc46bda19c2b464ffe86db46df6922fd323
+        id: changed-files
+        with:
+          # For files_yaml, the general idea is to organize the files we want to scan ourselves based on globbing.
+          # By organizing, we gain several things:
+          # 1. The mapping header (e.g. shell) becomes an output by the changed-files action, which we can use in conditionals (see https://github.com/tj-actions/changed-files?tab=readme-ov-file#outputs-)
+          # 2. The conditionals can help us speed up linting by only running jobs for changed files, avoiding excess runtime and spend
+          # 3. Each output can optionally be passed around for future use (say, for SAST scans or bot behaviors)
+          files_yaml: |
+            gh_actions:
+              - '.github/workflows/*.y*ml'
+            json:
+              - '**/*.json'
+              - '*.json'
+              - '.*.json'
+              - .github/workflows/ci.yml
+            shell:
+              - '**/*.sh'
+              - '**/.*.sh'
+              - '.*.sh'
+              - '*.sh'
+              - '**/*.zsh'
+              - '**/.*.zsh'
+              - '*.zsh'
+              - '.*.zsh'
+              - .github/workflows/ci.yml
+            markdown:
+              - '**/*.md'
+              - '*.md'
+              - .github/workflows/ci.yml
+            python:
+              - '**/*.py'
+              - '*.py'
+              - .github/workflows/ci.yml
+            yaml:
+              - '**/*.y*ml'
+              - '**/.*.y*ml'
+              - '.*.y*ml'
+              - '*.y*ml'
+              - .github/workflows/ci.yml
+
+  shelllint:
+    name: Shell Lint
+    needs:
+      - changed-files
+    runs-on: ubuntu-slim
+    if: "(needs.changed-files.outputs.shell == 'true' ||
+         github.event_name == 'workflow_dispatch')"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/mise-install
+        with:
+          packages: shellcheck
+          cache-name: shellcheck-ci
+      - name: Shellcheck
+        run: |
+          eval "$("$HOME/.local/bin/mise" activate bash)"
+          # shellcheck disable=SC2046
+          shellcheck -s bash -x $(find . -type f \( -name "*.sh" -o -name "*.zsh" \) -print0 | xargs -0)
+
+  jsonlint:
+    name: JSON Linting
+    needs:
+      - changed-files
+    if: "(needs.changed-files.outputs.json == 'true' ||
+         github.event_name == 'workflow_dispatch')"
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v6
+      - run: |
+          sudo apt-get install -yqq jq
+          scripts/utils/check-json.sh
+
+  yamllint:
+    name: Yaml Linting
+    needs:
+      - changed-files
+    if: "(needs.changed-files.outputs.yaml == 'true' ||
+         github.event_name == 'workflow_dispatch')"
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/mise-install
+        with:
+          packages: yamllint
+          cache-name: yamllint-ci
+      - name: yaml lint
+        run: |
+          eval "$("$HOME/.local/bin/mise" activate bash)"
+          yamllint -c .yamllint-config.yaml .
+
+  markdown:
+    name: Markdown linting
+    needs:
+      - changed-files
+    runs-on: ubuntu-slim
+    if: "(needs.changed-files.outputs.markdown == 'true' ||
+         github.event_name == 'workflow_dispatch')"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/mise-install
+        with:
+          packages: markdownlint-cli2
+          cache-name: markdown-ci
+      - name: markdownlint
+        run: |
+          eval "$("$HOME/.local/bin/mise" activate bash)"
+          markdownlint-cli2 --config .markdownlint-cli2.yaml
+
+  actionlint:
+    name: actionlint
+    needs:
+      - changed-files
+    if: "(needs.changed-files.outputs.gh_actions == 'true' ||
+         github.event_name == 'workflow_dispatch')"
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/mise-install
+        with:
+          packages: actionlint
+          cache-name: actionlint-ci
+      - name: Actionlint
+        run: |
+          eval "$("$HOME/.local/bin/mise" activate bash)"
+          actionlint
+
+  pythonlint:
+    name: Python Lint
+    needs:
+      - changed-files
+    runs-on: ubuntu-slim
+    if: "(needs.changed-files.outputs.python == 'true' ||
+         github.event_name == 'workflow_dispatch')"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/mise-install
+        with:
+          packages: ruff ty uv
+          cache-name: python-ci
+      - name: Ruff Format
+        run: |
+          eval "$("$HOME/.local/bin/mise" activate bash)"
+          ruff format .
+      - name: Ruff Check
+        run: |
+          eval "$("$HOME/.local/bin/mise" activate bash)"
+          ruff check .
+      - name: Type checking
+        run: |
+          eval "$("$HOME/.local/bin/mise" activate bash)"
+          scripts/utils/python-type-check.sh
+
+  python-testing:
+    name: Python Testing
+    needs:
+      - changed-files
+    runs-on: ubuntu-slim
+    if: "(needs.changed-files.outputs.python == 'true' ||
+         github.event_name == 'workflow_dispatch')"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/mise-install
+        with:
+          packages: uv
+          cache-name: python-test-ci
+      - name: Python Tests
+        run: |
+          eval "$("$HOME/.local/bin/mise" activate bash)"
+          uv run pytest
