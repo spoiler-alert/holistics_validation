@@ -62,22 +62,18 @@ runs:
       env:
         REQUIREMENTS: ${{ inputs.pip-requirements }}
         REQUIREMENTS_TXT_PATH: ${{ inputs.pip-requirements-path }}
-      run: |
-        if [[ "${REQUIREMENTS}" == "true" ]]; then
-          eval "$($HOME/.local/bin/mise activate bash)"
-          pip install --progress-bar off -r "${REQUIREMENTS_TXT_PATH}"
-          mise reshim
-        fi
-    - name: install pip packages
-      shell: bash
-      env:
         PACKAGES: ${{ inputs.pip-packages }}
       run: |
-        if [[ -n "${PACKAGES}" ]]; then
+        if [[ "${REQUIREMENTS}" == "true" || -n "${PACKAGES}" ]]; then
           mkdir $HOME/.ssh
           ssh-keyscan -H github.com >> "$HOME/.ssh/known_hosts"
           eval "$($HOME/.local/bin/mise activate bash)"
-          pip install --progress-bar off ${PACKAGES}
+          if [[ "${REQUIREMENTS}" == "true" ]]; then
+            pip install --progress-bar off -r "${REQUIREMENTS_TXT_PATH}"
+          fi
+          if [[ -n "${PACKAGES}" ]]; then
+            pip install --progress-bar off ${PACKAGES}
+          fi
           mise reshim
         fi
     - name: uv sync
