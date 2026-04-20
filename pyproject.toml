@@ -3,7 +3,7 @@ name = 'holistics_validation'
 version = '1.2.0'
 description = 'A tool for validating holistics code'
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 authors = [
     {name = "Spoiler Alert"}
 ]
