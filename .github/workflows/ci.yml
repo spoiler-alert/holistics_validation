@@ -66,6 +66,8 @@ jobs:
             python:
               - '**/*.py'
               - '*.py'
+              - 'pyproject.toml'
+              - 'uv.lock'
               - .github/workflows/ci.yml
             yaml:
               - '**/*.y*ml'
