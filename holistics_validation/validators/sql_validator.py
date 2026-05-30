@@ -15,20 +15,6 @@ dependent_field_replace_regex = r"\w+(?= *}})"
 sql_engine_interfaces = {"bigquery": BigQueryInterface}
 
 
-def parse_overrides(override_string):
-    if not override_string:
-        return []
-    override_list = override_string.split(",")
-    if not all([":" in x for x in override_list]):
-        logger.error(
-            "Expected ':' in override to separate before and after values, but didn't find any in at least one of the overrides: %s",
-            override_list,
-        )
-        raise ValueError("Expected ':' in override to separate before and after values, but didn't find any in at least one of the overrides")
-    override_list = [x.split(":") for x in override_string.split(",")]
-    return override_list
-
-
 def run_sql_validation(
     sql_engine,
     credential_dict,
@@ -36,12 +22,9 @@ def run_sql_validation(
     holistics_project_id,
     commit_oid=None,
     branch_name=None,
-    override_string=None,
 ):
 
     with sql_engine_interfaces[sql_engine](credential_dict) as sql_interface_object:
-        overrides = parse_overrides(override_string)
-
         data = holistics_api_client.retrieve_model_fields(holistics_project_id=holistics_project_id, commit_oid=commit_oid, branch_name=branch_name)
 
         model_validations = []
@@ -50,7 +33,7 @@ def run_sql_validation(
         for model in data["data_models"]:
             try:
                 sql_validator = SQLValidator(sql_interface_object)
-                sql_validator.start_validation(model, overrides)
+                sql_validator.start_validation(model)
                 model_validations.append(sql_validator)
             except Exception:
                 logger.error(traceback.format_exc())
@@ -75,7 +58,7 @@ class SQLValidator:
     def __init__(self, sql_interface_object):
         self.sql_interface_object = sql_interface_object
 
-    def start_validation(self, model, overrides):
+    def start_validation(self, model):
 
         logger.debug("Starting validation of fields in model: %s", model["name"])
         self.validation_jobs = {}
@@ -84,8 +67,6 @@ class SQLValidator:
             short_table_name = model["table_name"].split(".")[-1]
             full_table_name = model["table_name"]
             cte = ""
-            for override in overrides:
-                full_table_name = full_table_name.replace(override[0], override[1])
         else:
             if "{%" in model["sql"] or "{{" in model["sql"]:
                 logger.warning(
@@ -96,8 +77,6 @@ class SQLValidator:
             short_table_name = "temp_table"
             full_table_name = "temp_table"
             cte = self.sql_interface_object.cte.format(table_sql=model["sql"])
-            for override in overrides:
-                cte = cte.replace(override[0], override[1])
 
         dimensions, measures = self.create_field_dicts(model["name"], model["dimensions"], model["measures"], short_table_name)
         for key, val in {"dimensions": dimensions, "measures": measures}.items():
@@ -164,11 +143,7 @@ class SQLValidator:
 
                     ## only work on sql fields, since we can't easily convert AQL fields to sql
                     if re.search(source_field_full_regex, field_sql):
-                        field_sql = re.sub(
-                            source_field_full_regex,
-                            self.replace_source_funtion,
-                            field_sql,
-                        )
+                        field_sql = re.sub(source_field_full_regex, self.replace_source_funtion, field_sql)
                     if "{{" in field_sql:
                         dependent_fields[field_name] = field_sql
                     else:
