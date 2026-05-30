@@ -78,7 +78,7 @@ class HolisticsAPIClient:
 
         return status, data["job"]["last_error_log"]
 
-    def check_job_result(self, job_id):
+    def check_job_result(self, job_id, error_field):
         """
         Some holistics jobs (ex. publish and validate) need you to check the result,
         while others (ex. preload dashboard) are ok to just check the completion.
@@ -96,7 +96,7 @@ class HolisticsAPIClient:
         logger.debug("Job Result Response: \n%s", json.dumps(data, indent=4))
 
         status = data["result"]["data"]["status"]
-        errors = data["result"]["data"].get("errors", [])
+        errors = data["result"]["data"].get(error_field, [])
 
         return status, errors
 

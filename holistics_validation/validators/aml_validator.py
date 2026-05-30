@@ -20,7 +20,7 @@ def run_aml_validation(holistics_api_client: HolisticsAPIClient | FakeAPIClient,
 
     if status == "success":
         logger.info("AML Validation finished, checking for errors")
-        result, errors = holistics_api_client.check_job_result(job_id)
+        result, errors = holistics_api_client.check_job_result(job_id, "errors")
 
         if result == "success":
             logger.info("AML Validation completed successfully and found no errors")
