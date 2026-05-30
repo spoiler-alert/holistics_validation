@@ -13,7 +13,7 @@ class FakeAPIClient:
         else:
             return self.job_completion_status, "Test error message - job failed to run"
 
-    def check_job_result(self, job_id):
+    def check_job_result(self, job_id, error_field):
         if self.job_result == "success":
             return self.job_result, None
         else:
