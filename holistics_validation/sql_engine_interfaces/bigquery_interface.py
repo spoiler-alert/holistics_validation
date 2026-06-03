@@ -61,7 +61,7 @@ class BigQueryInterface:
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
-        pass  # BQ doesn't need to close the connection
+        self.client.close()
 
     def start_job(self, query_string):
         return self.client.query(query_string)  # returns the job, the job still needs to be validated

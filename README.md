@@ -24,12 +24,14 @@ Validates all SQL fields using the specified SQL engine.  To use, run `holistics
 
 Arguments for SQL validation, regardless of SQL engine:
 
-- `holistics_project_id` (required)
+- `holistics_project_id` (required): if you click on "Development" in the holistics UI, this is in the URL ex. `.../projects/{project_id}/...`
 - `commit_oid` (optional): takes priority over branch_name if both are specified
 - `branch_name` (optional): used only if commit_oid is NOT specified, should be in the form of `origin/{branch_name}`
-- `overrides` (optional): Overrides do a blanket replace from one value to another in all SQL, useful for things like testing against a different data source.  Format of "orig_value_1:new_value_1,orig_value_2:new_value_2,etc".  Currently does not support using "," or ":" in the actual override values.  Certain characters will need to be escaped (ex. if you're using \` then you will need to escape it with a \\).
 
-> if NEITHER commit_oid or branch_name are specified, then it runs against production
+NOTES:
+
+- if NEITHER commit_oid or branch_name are specified, then it runs against production
+- if you want to test against alternative data (ex. run dbt changes and test holistics against those changes), we highly recommend setting up a separate service account and using user attributes to dynamically change the data source for only that user [as recommended by holistics here](https://docs.holistics.io/embedded/dynamic-data-sources)
 
 Currently supports the following SQL engines:
 
