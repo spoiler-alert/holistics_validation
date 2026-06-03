@@ -12,7 +12,7 @@ while (($#)); do
 	case $1 in
 		--help|-help|help|--h|-h)
 			echo "Usage: $0 [-h|--help]"
-			echo "This script configures a local machine to work effectively with the spoileralert repo"
+			echo "This script configures a local machine to work effectively with the holistics_validation repo"
 			echo
 			echo "Arguments:"
 			echo "-h|--help: Show this text"
