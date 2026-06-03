@@ -11,7 +11,7 @@ For now, we don't support multiple versions so doing the above will pull the mos
 
 ## General Usage
 
-Run `holistics_validation` followed by the type of validation or job you want to run.  Arguments that can be used for all types of validation:
+Run `holistics_validation` followed by the type of validation or job you want to run. Arguments that can be used for all types of validation:
 
 - `holistics_base_url` (optional value): default value `https://us.holistics.io/api/v2/` when not included, ensure your URL ends with a `/`
 - `holistics_api_key` (required)
@@ -20,7 +20,7 @@ Run `holistics_validation` followed by the type of validation or job you want to
 
 ### SQL Validation
 
-Validates all SQL fields using the specified SQL engine.  To use, run `holistics_validation sql`.  [Relies on the endpoint here](https://docs.holistics.io/api#tag/Data-Models/operation/DataModels_List).
+Validates all SQL fields using the specified SQL engine. To use, run `holistics_validation sql`. [Relies on the endpoint here](https://docs.holistics.io/api#tag/Data-Models/operation/DataModels_List).
 
 Arguments for SQL validation, regardless of SQL engine:
 
@@ -44,7 +44,7 @@ Currently supports the following SQL engines:
 
 ### AML Validation
 
-Validates all SQL fields using the specified SQL engine.  To use, run `holistics_validation aml`.
+Validates all SQL fields using the specified SQL engine. To use, run `holistics_validation aml`.
 
 Arguments for AML validation:
 
@@ -81,7 +81,7 @@ Intended to cover if a code change would break:
 
 **Please note:** this is different from Reporting Validation!
 
-Unlike the other validators, Dashboard Validation only applies to dashboards and code already published rather than testing a specific branch/commit.  It can be passed a list of dashboard IDs of any type of dashboard - a released canvas dashboard (v4) or a quick / legacy dashboard (v3) - and it will preload the dashboards (causing the SQL to be compiled and run), and reporting back any errors.  This is useful if holistics has released a change that broke pre-existing dashboards and you want to check a bunch of dashboards to see what's broken, or if a code change that breaks dashboards somehow got released without being caught.
+Unlike the other validators, Dashboard Validation only applies to dashboards and code already published rather than testing a specific branch/commit. It can be passed a list of dashboard IDs of any type of dashboard - a released canvas dashboard (v4) or a quick / legacy dashboard (v3) - and it will preload the dashboards (causing the SQL to be compiled and run), and reporting back any errors. This is useful if holistics has released a change that broke pre-existing dashboards and you want to check a bunch of dashboards to see what's broken, or if a code change that breaks dashboards somehow got released without being caught.
 
 Arguments for Dashboard Validation:
 
@@ -94,11 +94,11 @@ Intended to cover:
 
 ## Tooling Options
 
-In order to enable a full holistics CI/CD pipeline, this project is going to also include some tooling in addition to pure validation.  For now, this includes publishing, but might be expanded in the future.
+In order to enable a full holistics CI/CD pipeline, this project is going to also include some tooling in addition to pure validation. For now, this includes publishing, but might be expanded in the future.
 
 ### Publish
 
-Publishes any code that is merged into the master branch.  To use, run `holistics_validation publish`.  There are no additional arguments specific to only the publish command.
+Publishes any code that is merged into the master branch. To use, run `holistics_validation publish`. There are no additional arguments specific to only the publish command.
 
 ## Local Development
 

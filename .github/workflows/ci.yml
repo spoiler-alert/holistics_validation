@@ -146,7 +146,7 @@ jobs:
       - name: markdown lint
         run: |
           eval "$("$HOME/.local/bin/mise" activate bash)"
-          rumdl check .
+          rumdl check --diff .
 
   actionlint:
     name: actionlint
