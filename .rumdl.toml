@@ -1,0 +1,16 @@
+[global]
+disable = [
+"MD051",  # unordered list indentation
+"MD033",  # line length
+"MD042",  # no inline html
+"MD007",  # no empty links
+"MD013",  # link fragments
+]
+
+exclude = [
+  "**/node_modules/**",
+  "/.github/pull_request_template.md",
+  # these are markdown in name only...
+  "/tools/holistics-mcp/resources/*",
+  "**/vendor/**",
+]

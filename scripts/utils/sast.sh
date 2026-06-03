@@ -40,26 +40,26 @@ exit_code=0
 
 # we use --no-git-ignore so .semgrepignore doesn't get overridden.
 # If .semgrepignore gets overridden, we end up scanning large parts of .yarn, which is slow and useless
-_OPTIONS="--disable-version-check --no-autofix --metrics off --error --no-git-ignore"
+_OPTIONS="--disable-version-check --no-autofix --error --no-git-ignore --taint-intrafile --experimental --semgrepignore-filename=.opengrepignore"
 if [[ "${DEBUG}" == "true" ]]; then
 	_OPTIONS+=" --verbose"
 else
 	_OPTIONS+=" -q"
 fi
-_RULESETS="$(yq eval '.rulesets[]' .semgrep_settings.yml | sed 's/^/ -c /' | xargs)"
-_EXCLUDE="$(yq eval '.excluded[]' .semgrep_settings.yml | sed 's/^/ --exclude-rule /' | xargs)"
+_RULESETS="$(yq eval '.rulesets[]' .opengrep_settings.yml | sed 's/^/ -c /' | xargs)"
+_EXCLUDE="$(yq eval '.excluded[]' .opengrep_settings.yml | sed 's/^/ --exclude-rule /' | xargs)"
 
 printf "\nSAST scan for security/functional issues..\n"
 if [[ "${CI}" == "false" ]]; then
-	nosem_lines=$(grep --exclude-dir={node_modules,.git,build,built,dist,docs,.mongo_data} nosemgrep "$(pwd)" -RI | grep -Evc "\.md:")
-	printf "There are ~%s nosemgrep lines in the code base\n" "${nosem_lines}"
+	nosem_lines=$(grep --exclude-dir={node_modules,.git,build,built,dist,docs,.mongo_data} -E "noopengrep|nosemgrep" "$(pwd)" -RI | grep -Evc "\.md:")
+	printf "There are ~%s ignore lines in the code base\n" "${nosem_lines}"
 fi
-ignored_rules=$(yq eval '.excluded | length' .semgrep_settings.yml)
-rulesets=$(yq eval '.rulesets | length' .semgrep_settings.yml)
+ignored_rules=$(yq eval '.excluded | length' .opengrep_settings.yml)
+rulesets=$(yq eval '.rulesets | length' .opengrep_settings.yml)
 printf "There are %s ignored rules from %s rulesets\n\n" "${ignored_rules}" "${rulesets}"
 
 # shellcheck disable=SC2086
-semgrep scan ${_OPTIONS} ${_RULESETS} ${_EXCLUDE} .
+opengrep scan ${_OPTIONS} ${_RULESETS} ${_EXCLUDE} .
 _exit=$?
 if [[ "${exit_code}" -eq 0 ]]; then
 	exit_code="${_exit}"
