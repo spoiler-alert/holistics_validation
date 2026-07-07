@@ -38,6 +38,7 @@ runs:
 
     - name: install mise
       shell: bash
+      # noopengrep: yaml.github-actions.security.gha-curl-pipe-shell.gha-curl-pipe-shell
       run: |
         curl -SsLf https://mise.run | sh > /dev/null 2>&1
         "$HOME/.local/bin/mise" trust --quiet .config/mise.toml

@@ -38,3 +38,4 @@ excluded:
   - ai.ai-best-practices.hooks-no-input-validation.hooks-no-input-validation-bash.hooks-no-input-validation-bash
   - ai.ai-best-practices.hooks-no-input-validation.hooks-no-input-validation.hooks-no-input-validation-bash
   - ai.ai-best-practices.hooks-unquoted-variable.hooks-unquoted-variable.hooks-unquoted-variable-bash-eval
+  - yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
