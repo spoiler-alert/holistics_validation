@@ -3,8 +3,13 @@
 pre-commit:
   parallel: true
   jobs:
-    - name: markdown linting
-      run: markdownlint-cli2 --fix --config .markdownlint-cli2.yaml {staged_files}
+    - name: markdown formatting
+      run: rumdl fmt {staged_files}
+      glob:
+        - "*.md"
+      stage_fixed: true
+    - name: markdown checking
+      run: rumdl check --fix {staged_files}
       glob:
         - "*.md"
       stage_fixed: true

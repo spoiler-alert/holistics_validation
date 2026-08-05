@@ -1,5 +1,6 @@
 import requests
 import time
+import json
 
 from holistics_validation.exceptions import BadAPIResponse
 from holistics_validation.logger import logger
@@ -48,6 +49,11 @@ class HolisticsAPIClient:
         return data
 
     def check_job_completion(self, job_id):
+        """
+        Some holistics jobs (ex. publish and validate) need you to check the result
+        after checking that the job has completed, while others (ex. preload dashboard)
+        are ok to just check the completion
+        """
 
         endpoint = f"jobs/{job_id}"
         request_url = self.holistics_base_url + endpoint
@@ -59,8 +65,8 @@ class HolisticsAPIClient:
             logger.debug('Attempting request against "%s"', request_url)
             request_job = self.session.get(request_url, headers=self.headers)
             data = self.parse_response(request_job)
+            logger.debug("Job Response: \n%s", json.dumps(data, indent=4))
             status = data["job"]["status"]
-            logger.debug("Status: %s", status)
             if status in ("success", "failure"):
                 break
             else:
@@ -71,6 +77,28 @@ class HolisticsAPIClient:
                 time.sleep(2)
 
         return status, data["job"]["last_error_log"]
+
+    def check_job_result(self, job_id, error_field):
+        """
+        Some holistics jobs (ex. publish and validate) need you to check the result,
+        while others (ex. preload dashboard) are ok to just check the completion.
+        This function assumes you've already checked that the job has completed.
+        """
+
+        endpoint = f"jobs/{job_id}/result"
+        request_url = self.holistics_base_url + endpoint
+
+        logger.info("Checking result of job: %s", job_id)
+
+        request_job = self.session.get(request_url, headers=self.headers)
+        data = self.parse_response(request_job)
+
+        logger.debug("Job Result Response: \n%s", json.dumps(data, indent=4))
+
+        status = data["result"]["data"]["status"]
+        errors = data["result"]["data"].get(error_field, [])
+
+        return status, errors
 
     def validate_aml(self, commit_oid, branch_name):
 

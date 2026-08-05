@@ -11,7 +11,7 @@ For now, we don't support multiple versions so doing the above will pull the mos
 
 ## General Usage
 
-Run `holistics_validation` followed by the type of validation or job you want to run.  Arguments that can be used for all types of validation:
+Run `holistics_validation` followed by the type of validation or job you want to run. Arguments that can be used for all types of validation:
 
 - `holistics_base_url` (optional value): default value `https://us.holistics.io/api/v2/` when not included, ensure your URL ends with a `/`
 - `holistics_api_key` (required)
@@ -20,16 +20,18 @@ Run `holistics_validation` followed by the type of validation or job you want to
 
 ### SQL Validation
 
-Validates all SQL fields using the specified SQL engine.  To use, run `holistics_validation sql`.  [Relies on the endpoint here](https://docs.holistics.io/api#tag/Data-Models/operation/DataModels_List).
+Validates all SQL fields using the specified SQL engine. To use, run `holistics_validation sql`. [Relies on the endpoint here](https://docs.holistics.io/api#tag/Data-Models/operation/DataModels_List).
 
 Arguments for SQL validation, regardless of SQL engine:
 
-- `holistics_project_id` (required)
+- `holistics_project_id` (required): if you click on "Development" in the holistics UI, this is in the URL ex. `.../projects/{project_id}/...`
 - `commit_oid` (optional): takes priority over branch_name if both are specified
 - `branch_name` (optional): used only if commit_oid is NOT specified, should be in the form of `origin/{branch_name}`
-- `overrides` (optional): Overrides do a blanket replace from one value to another in all SQL, useful for things like testing against a different data source.  Format of "orig_value_1:new_value_1,orig_value_2:new_value_2,etc".  Currently does not support using "," or ":" in the actual override values.  Certain characters will need to be escaped (ex. if you're using \` then you will need to escape it with a \\).
 
-> if NEITHER commit_oid or branch_name are specified, then it runs against production
+NOTES:
+
+- if NEITHER commit_oid or branch_name are specified, then it runs against production
+- if you want to test against alternative data (ex. run dbt changes and test holistics against those changes), we highly recommend setting up a separate service account and using user attributes to dynamically change the data source for only that user [as recommended by holistics here](https://docs.holistics.io/embedded/dynamic-data-sources)
 
 Currently supports the following SQL engines:
 
@@ -42,7 +44,7 @@ Currently supports the following SQL engines:
 
 ### AML Validation
 
-Validates all SQL fields using the specified SQL engine.  To use, run `holistics_validation aml`.
+Validates all SQL fields using the specified SQL engine. To use, run `holistics_validation aml`.
 
 Arguments for AML validation:
 
@@ -79,7 +81,7 @@ Intended to cover if a code change would break:
 
 **Please note:** this is different from Reporting Validation!
 
-Unlike the other validators, Dashboard Validation only applies to dashboards and code already published rather than testing a specific branch/commit.  It can be passed a list of dashboard IDs of any type of dashboard - a released canvas dashboard (v4) or a quick / legacy dashboard (v3) - and it will preload the dashboards (causing the SQL to be compiled and run), and reporting back any errors.  This is useful if holistics has released a change that broke pre-existing dashboards and you want to check a bunch of dashboards to see what's broken, or if a code change that breaks dashboards somehow got released without being caught.
+Unlike the other validators, Dashboard Validation only applies to dashboards and code already published rather than testing a specific branch/commit. It can be passed a list of dashboard IDs of any type of dashboard - a released canvas dashboard (v4) or a quick / legacy dashboard (v3) - and it will preload the dashboards (causing the SQL to be compiled and run), and reporting back any errors. This is useful if holistics has released a change that broke pre-existing dashboards and you want to check a bunch of dashboards to see what's broken, or if a code change that breaks dashboards somehow got released without being caught.
 
 Arguments for Dashboard Validation:
 
@@ -92,11 +94,11 @@ Intended to cover:
 
 ## Tooling Options
 
-In order to enable a full holistics CI/CD pipeline, this project is going to also include some tooling in addition to pure validation.  For now, this includes publishing, but might be expanded in the future.
+In order to enable a full holistics CI/CD pipeline, this project is going to also include some tooling in addition to pure validation. For now, this includes publishing, but might be expanded in the future.
 
 ### Publish
 
-Publishes any code that is merged into the master branch.  To use, run `holistics_validation publish`.  There are no additional arguments specific to only the publish command.
+Publishes any code that is merged into the master branch. To use, run `holistics_validation publish`. There are no additional arguments specific to only the publish command.
 
 ## Local Development
 

@@ -29,10 +29,6 @@ def sql_parser_add_args(parser):
     parser.add_argument(
         "--bq_project_name", required=True
     )  ## assumes that you have a BQ config file set up, if this is ever generalized to other query enginers then engine should probably be a sub-command with different inputs
-    parser.add_argument(
-        "--overrides",
-        help="Overrides do a blanket replace from one value to another in all SQL, useful for things like testing against a different data source.",
-    )
 
 
 def aml_parser_add_args(parser):
@@ -111,7 +107,6 @@ def main():
                 holistics_project_id=args.holistics_project_id,
                 commit_oid=args.commit_oid,
                 branch_name=args.branch_name,
-                override_string=args.overrides,
             )
 
         if args.command == "aml":
