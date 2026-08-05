@@ -2,11 +2,11 @@ import argparse
 import logging
 
 from holistics_validation.holistics_api_client import HolisticsAPIClient
-from holistics_validation.validators.sql_validator import run_sql_validation
+from holistics_validation.logger import logger
+from holistics_validation.tooling.publish_aml import run_publish_aml
 from holistics_validation.validators.aml_validator import run_aml_validation
 from holistics_validation.validators.dashboard_validator import run_dashboard_validation
-from holistics_validation.tooling.publish_aml import run_publish_aml
-from holistics_validation.logger import logger
+from holistics_validation.validators.sql_validator import run_sql_validation
 
 
 def generic_parser_add_args(parser):

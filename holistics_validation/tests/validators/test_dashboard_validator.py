@@ -1,8 +1,8 @@
 import pytest
 
-from holistics_validation.validators.dashboard_validator import run_dashboard_validation
 from holistics_validation.exceptions import FailedValidation, UnexpectedJobStatus
 from holistics_validation.tests.utils import FakeAPIClient
+from holistics_validation.validators.dashboard_validator import run_dashboard_validation
 
 
 def test_run_dashboard_validator_success():

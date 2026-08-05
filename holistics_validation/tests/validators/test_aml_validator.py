@@ -1,8 +1,8 @@
 import pytest
 
-from holistics_validation.validators.aml_validator import run_aml_validation
 from holistics_validation.exceptions import FailedValidation, UnexpectedJobStatus
 from holistics_validation.tests.utils import FakeAPIClient
+from holistics_validation.validators.aml_validator import run_aml_validation
 
 
 def test_run_aml_validation_success(caplog):

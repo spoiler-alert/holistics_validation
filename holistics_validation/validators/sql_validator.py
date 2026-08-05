@@ -1,10 +1,9 @@
 import re
 import traceback
 
-from holistics_validation.sql_engine_interfaces.bigquery_interface import BigQueryInterface
-from holistics_validation.exceptions import ReferencesUndefinedSQL, FailedValidation
+from holistics_validation.exceptions import FailedValidation, ReferencesUndefinedSQL
 from holistics_validation.logger import logger
-
+from holistics_validation.sql_engine_interfaces.bigquery_interface import BigQueryInterface
 
 source_field_full_regex = r"{{ *#SOURCE\.\w+ *}}"
 source_field_replace_regex = r"(?<=#SOURCE\.)\w+"
@@ -35,7 +34,7 @@ def run_sql_validation(
                 sql_validator = SQLValidator(sql_interface_object)
                 sql_validator.start_validation(model)
                 model_validations.append(sql_validator)
-            except Exception:
+            except Exception:  # noqa: BLE001
                 logger.error(traceback.format_exc())
                 failure_creating_query.append(model["name"])
 
@@ -186,7 +185,7 @@ class SQLValidator:
             try:
                 logger.debug("Checking validation for %s", validation_name)
                 self.sql_interface_object.check_job_results(val["job"])
-            except Exception:
+            except Exception:  # noqa: BLE001
                 logger.error("Validation query failed, query that was run is below:")
                 logger.error(val["query"])
                 logger.error(traceback.format_exc())

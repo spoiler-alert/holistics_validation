@@ -1,8 +1,8 @@
 import pytest
 
-from holistics_validation.tooling.publish_aml import run_publish_aml
 from holistics_validation.exceptions import FailedPublish, UnexpectedJobStatus
 from holistics_validation.tests.utils import FakeAPIClient
+from holistics_validation.tooling.publish_aml import run_publish_aml
 
 
 def test_run_publish_aml_success():

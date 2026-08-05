@@ -1,6 +1,7 @@
-import requests
-import time
 import json
+import time
+
+import requests
 
 from holistics_validation.exceptions import BadAPIResponse
 from holistics_validation.logger import logger

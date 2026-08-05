@@ -19,7 +19,7 @@ def run_publish_aml(holistics_api_client: HolisticsAPIClient | FakeAPIClient) ->
     if status == "success":
         logger.info("Publish AML completed successfully")
     elif status == "failure":
-        result, errors = holistics_api_client.check_job_result(job_id, "error_details")
+        _, errors = holistics_api_client.check_job_result(job_id, "error_details")
         logger.error("Publish AML failed with an error message of '%s' and the following errors: %s", error_message, errors)
         raise FailedPublish()
     else:
