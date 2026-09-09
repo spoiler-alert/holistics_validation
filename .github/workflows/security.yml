@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -39,7 +39,7 @@ jobs:
     if: "github.actor != 'dependabot[bot]'"
     steps:
       - name: checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - uses: ./.github/actions/mise-install
         with:
           packages: opengrep
