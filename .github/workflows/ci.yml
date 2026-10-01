@@ -119,8 +119,9 @@ jobs:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/mise-install
         with:
-          packages: yamllint
+          packages: python
           cache-name: yamllint-ci
+          pip-packages: yamllint
       - name: yaml lint
         run: |
           eval "$("$HOME/.local/bin/mise" activate bash)"
