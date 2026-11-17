@@ -11,3 +11,7 @@ gitleaks = 'latest'
 lefthook = 'latest'
 ty = 'latest'
 nodejs = 'lts'
+
+[tool_alias]
+opengrep = "github:opengrep/opengrep"
+
