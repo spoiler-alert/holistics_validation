@@ -47,4 +47,4 @@ jobs:
       - name: SAST checks
         run: |
           eval "$("$HOME/.local/bin/mise" activate bash)"
-          bash scripts/utils/sast.sh
+          bash scripts/utils/sast.sh --vendor-download
